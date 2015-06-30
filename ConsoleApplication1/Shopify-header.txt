@@ -1,0 +1,27 @@
+Handle	
+Title	
+Body (HTML)	
+Description	
+Original 
+Price	
+Vendor	
+VendorShort	
+Lead Time	
+MOQ	
+Condition	
+Type	
+Collection	
+Variant Price	
+Variant SKU	
+Variant Taxable	
+Option1 Name	
+Option1 Value	
+Option2 Name	
+Option2 Value	
+Option3 Name	
+Option3 Value	
+Tags	
+SEO Title	
+SEO Description	
+Image Src	
+Note
