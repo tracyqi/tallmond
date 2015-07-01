@@ -66,16 +66,16 @@ namespace Upload
                                 o.TransCode = "A";
                                 o.PartNumber = record.PN;
                                 o.AlternatePartNumber = string.Empty;
-                                o.Condition = String.IsNullOrEmpty(record.Condition)?"NE":record.Condition;
+                                o.Condition = String.IsNullOrEmpty(record.Condition) ? "NE" : record.Condition;
                                 o.Quantity = record.Quantity;
-                                o.Description = record.Description + " For details, please check http://www.business.aero" ;
+                                o.Description = record.Description + " For details, please check http://www.business.aero";
                                 o.CAGE = string.Empty;
                                 o.Category = string.Empty;
                                 o.ControlCode = string.Empty;
                                 o.Value = string.Empty;
                                 o.ListCode = "Y";
                                 //o.Price = record.UnitPrice; TODO: list price in the future
-                                o.UoM = String.IsNullOrEmpty(record.UoM)?"EA":record.UoM;
+                                o.UoM = String.IsNullOrEmpty(record.UoM) ? "EA" : record.UoM;
                                 o.TotalPrice = o.Quantity * record.UnitPrice;
 
                                 csvwriter.WriteRecord<OutputILSmart>(o);
@@ -96,6 +96,7 @@ namespace Upload
             string outfile = Path.Combine(Path.Combine(outputfolder, "Shopify_" + fn));
             #endregion
 
+            #region transform files
             //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
             using (TextReader reader = File.OpenText(fileName))
             {
@@ -133,11 +134,11 @@ namespace Upload
                                 o.LeadTime = 1;
                                 //o.MOQ = 1; //TODO: total price 
                                 o.Condition = "NE";
-                                    //AR – As Removed
-                                    //NE – New Equipment
-                                    //NS – New Surplus
-                                    //OH – Overhauled
-                                    //SV – Serviceable
+                                //AR – As Removed
+                                //NE – New Equipment
+                                //NS – New Surplus
+                                //OH – Overhauled
+                                //SV – Serviceable
                                 o.Type = "Aircraft Parts";
                                 o.Collection = vendor;
                                 //o.VariantPrice = o.OriginalPrice * 1.5;
@@ -165,6 +166,44 @@ namespace Upload
                         }
                     }
                 }
+            }
+            #endregion
+
+            #region split the files if too big
+            string[] filePaths = Directory.GetFiles(outputfolder);
+
+            foreach (string file in filePaths)
+            {
+                string f = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file));
+                Split(file, outputfolder);
+            }
+            #endregion
+        }
+
+        public static void Split(string inputfile, string outputfolder)
+        {
+            int maxLineCount = 5000;
+            FileInfo file = new FileInfo(inputfile);
+
+            var lines = File.ReadLines(inputfile).Take(1).ToArray();
+
+            var fileGroups = File.ReadLines(file.FullName)
+                .Select((l, i) => new { Line = l, Index = i })
+                .GroupBy(x => x.Index / maxLineCount)
+                .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
+
+            foreach (var grp in fileGroups)
+            {
+                if (!Directory.Exists(outputfolder + "_new"))
+                    Directory.CreateDirectory (outputfolder + "_new");
+
+                string f = Path.Combine(outputfolder +"_new", Path.GetFileNameWithoutExtension(inputfile) + "_" + grp.FileIndex + ".csv");
+
+                // Write headers for splitted file (Skip the first file)
+                if (grp.FileIndex > 0)
+                    File.WriteAllLines(f, lines);
+
+                File.AppendAllLines(f, grp.Lines);
             }
         }
     }
