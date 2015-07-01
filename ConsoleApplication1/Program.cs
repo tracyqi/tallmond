@@ -131,7 +131,7 @@ namespace Upload
                                 o.OriginalPrice = record.UnitPrice;
                                 o.Vendor = vendor;
                                 o.VendorShort = vendorshort;
-                                o.LeadTime = 1;
+                                o.LeadTime = record.LeadTime;
                                 //o.MOQ = 1; //TODO: total price 
                                 o.Condition = "NE";
                                 //AR – As Removed
@@ -147,7 +147,7 @@ namespace Upload
                                 o.Option1Name = "Title";
                                 o.Option1Value = "Default Title";
                                 o.Option2Name = "Leadtime";
-                                o.Option2Value = "1";
+                                o.Option2Value = record.LeadTime.ToString();
                                 o.Option3Name = "MOQ";
                                 o.Option3Value = o.MOQ;
                                 o.Tags = string.Join(",", (String.IsNullOrEmpty(record.Description) || record.Description.Contains("?")) ? record.PN : record.Description, o.Vendor, o.Type, o.Condition, record.PN);
@@ -158,7 +158,7 @@ namespace Upload
                                         "<li>Comes with FAA 8130 form 3 </li>" +
                                         "<li>All parts are subject to prior sale </li>" +
                                         "<li>Sale price is effective for available inventory only </li>" +
-                                        "<li><b>FOB China </b> </li>";
+                                        "<li><b>"+ (string.IsNullOrEmpty(record.FOB)?"FOB Washington, USA":record.FOB) +"</b> </li>";
                                 o.Quantity = record.Quantity;
 
                                 csvwriter.WriteRecord<OutputShopify>(o);
@@ -217,12 +217,15 @@ class Input
     public double UnitPrice { get; set; }
     public string Condition { get; set; }
     public string UoM { get; set; }
+    public string FOB { get; set; }
+    public int LeadTime { get; set; }
     public string Option1 { get; set; }//ATA;
     public string Option2 { get; set; }//EngineType;
     public string Option3 { get; set; }//AircraftType;
     public string Option4 { get; set; }//
     public string Option5 { get; set; }//
     public string Option6 { get; set; }//
+
 }
 
 class InputMap : CsvClassMap<Input>
@@ -238,6 +241,9 @@ class InputMap : CsvClassMap<Input>
         Map(m => m.UoM).Name("UoM");
         Map(m => m.Option2).Name("Engine Type");
         Map(m => m.Option3).Name("Aircraft type");
+        Map(m => m.FOB).Name("FOB");
+        Map(m => m.LeadTime).Name("Lead time");
+
     }
 }
 
@@ -398,33 +404,3 @@ public class OutputILSmart
 
 }
 
-
-
-
-//Handle	
-//Title	
-//Body (HTML)	
-//Description	
-//Original 
-//Price	
-//Vendor	
-//VendorShort	
-//Lead Time	
-//MOQ	
-//Condition	
-//Type	
-//Collection	
-//Variant Price	
-//Variant SKU	
-//Variant Taxable	
-//Option1 Name	
-//Option1 Value	
-//Option2 Name	
-//Option2 Value	
-//Option3 Name	
-//Option3 Value	
-//Tags	
-//SEO Title	
-//SEO Description	
-//Image Src	
-//Note
