@@ -122,12 +122,13 @@ namespace Upload
                                 var record = csv.GetRecord<Input>();
                                 //Input record = csv.GetRecord<Input>();
 
+                                
                                 var o = new OutputShopify();
                                 o.Handle = record.PN + "-" + vendorshort;
                                 o.Title = record.PN;
                                 //o.Body = record.PN;//(HTML)	//TODO
-                                o.Description = (String.IsNullOrEmpty(record.Description) || record.Description.Contains("?")) ? record.PN : record.Description
-                                    + (String.IsNullOrEmpty(record.UoM) ? string.Empty : "<b> Unit of Measure: </b>" + record.UoM);
+                                o.Description = (String.IsNullOrEmpty(record.Description) || record.Description.Contains("?")) ? string.Empty : record.Description;
+                                    //+ (String.IsNullOrEmpty(record.UoM) ? string.Empty : "<b> Unit of Measure: </b>" + record.UoM);
                                 o.OriginalPrice = record.UnitPrice;
                                 o.Vendor = vendor;
                                 o.VendorShort = vendorshort;
@@ -320,8 +321,8 @@ public class OutputShopify
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", this.Description, "<br>");
             sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", this.Title, "<br>");
-            sb.AppendFormat("{0}{1}", "<b>Note:</b>", "<br>");
-            sb.AppendFormat("{0}{1}{2}", "<ul>", this.Note, "</ul><br>");
+            sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
+            sb.AppendFormat("{0}{1}{2}", "", this.Note, "<br>");
             return sb.ToString();
         }
     }        //(HTML)	
