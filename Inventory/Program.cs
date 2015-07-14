@@ -10,6 +10,7 @@ using System.Reflection;
 using CsvHelper.Configuration;
 using CsvHelper;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Inventory
 {
@@ -19,8 +20,11 @@ namespace Inventory
         {
             switch (args[0])
             {
-                case "I":
-                    Import();
+                case "I-hn":
+                    ImportHainan();
+                    break;
+                case "I-ah":
+                    ImportAH();
                     break;
                 case "O":
                     GenerateShopify();
@@ -30,11 +34,11 @@ namespace Inventory
             }
         }
 
-        private static void Import()
+        private static void ImportAH()
         {
             //string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
 
-            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Hainan Airline", @"2015-06-23.xlsx");
+            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Airbus Helicopters\Airbus-Helicopters-2015.xlsx");
 
             var excelData = new ExcelData(path);
             var sheets = excelData.getWorksheetNames();
@@ -55,41 +59,59 @@ namespace Inventory
                     if (string.IsNullOrEmpty(pn))
                         continue;
 
-                    string vendorshort = "hn";
-                    string fob = "FOB China";
-                    string vendor = "hainan";
-                    string collection = "Hainan";
-                    string condition = string.IsNullOrEmpty(row.ItemArray[11].ToString().Trim()) ? "NE" : row.ItemArray[11].ToString().Trim();
+                    string vendorshort = "ah";
+                    string fob = "FOB Washington, USA ";
+                    string vendor = "Airbus Helicopters";
+                    string collection = "Airbus Helicopters";
+
+                    string condition = "NE";
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "condition", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        condition = string.IsNullOrEmpty(row.ItemArray[7].ToString().Trim()) ? "NE" : row.ItemArray[7].ToString().Trim();
+                    }
+
                     //AR – As Removed
                     //NE – New Equipment
                     //NS – New Surplus
                     //OH – Overhauled
                     //SV – Serviceable
 
-                    string certification = string.IsNullOrEmpty(row.ItemArray[12].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[12].ToString().Trim();
+                    string certification = "FAA 8130 form 3";
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "certification", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        certification = string.IsNullOrEmpty(row.ItemArray[8].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[8].ToString().Trim();
+                    }
 
-                    int leadtime = 3;
+                    int leadtime = 2;
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "Lead Time", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        leadtime = Convert.ToInt32(string.IsNullOrEmpty(row.ItemArray[9].ToString().Trim()) ? "2" : row.ItemArray[9].ToString().Trim());
+                    }
+
+                    string description = Regex.Replace(row.ItemArray[2].ToString(), @"[^\u0000-\u007F]", string.Empty);
+                        
+                        //ContainsUnicodeCharacter() ? row.ItemArray[2].ToString() : "N/A";
+                    double price = Convert.ToDouble(row.ItemArray[6]);
+                    int qty = Convert.ToInt32(row.ItemArray[3]);
+
 
                     //=IF(E2>=200,1,ROUNDUP(200/E2,0))
                     int MOQ = 1;
-                    if (Convert.ToDouble(row.ItemArray[4]) == 0)
+                    if (price == 0)
                     {
-                        MOQ = 0;
+                        MOQ = 1;
                     }
-                    else if (Convert.ToDouble(row.ItemArray[4]) >= 200)
+                    else if (price >= 200)
                     {
                         MOQ = 1;
                     }
                     else
                     {
-                        MOQ = Convert.ToInt32((200 / Convert.ToDouble(row.ItemArray[4]))) > Convert.ToInt32(row.ItemArray[1]) ? Convert.ToInt32(200 / Convert.ToDouble(row.ItemArray[4])) : Convert.ToInt32(row.ItemArray[1]);
+                        MOQ = Convert.ToInt32(200 / price) < qty ? Convert.ToInt32(200 / price) : qty;
                     }
 
-                    double price = Convert.ToDouble(row.ItemArray[6]);
-                    int qty = Convert.ToInt32(row.ItemArray[1]);
 
                     StringBuilder sb = new StringBuilder();
-                    string description = row.ItemArray[2].ToString();
                     string note = "<li><b>Condition:</b> " + condition + "</li>" +
                                         "<li>Comes with " + certification + " </li>" +
                                         "<li>All parts are subject to prior sale </li>" +
@@ -97,7 +119,7 @@ namespace Inventory
                                         "<li><b>" + fob + "</b> </li>";
 
                     sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
-                    sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", inventory.Title, "<br>");
+                    sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
                     sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
                     sb.AppendFormat("{0}{1}", "", note);
 
@@ -138,7 +160,134 @@ namespace Inventory
                 }
             }
         }
+        private static void ImportHainan()
+        {
+            //string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
 
+            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Hainan Airline", @"2015-06-23.xlsx");
+
+            var excelData = new ExcelData(path);
+            var sheets = excelData.getWorksheetNames();
+
+            TallamondEntities entityContext = new TallamondEntities();
+
+            foreach (var s in sheets)
+            {
+                var sheet = excelData.getData(s);
+                foreach (var row in sheet)
+                {
+                    Console.WriteLine(Environment.NewLine);
+
+                    Inventory inventory = new Inventory();
+
+                    string pn = row.ItemArray[0].ToString().Trim();
+
+                    if (string.IsNullOrEmpty(pn))
+                        continue;
+
+                    string vendorshort = "hn";
+                    string fob = "FOB China";
+                    string vendor = "hainan";
+                    string collection = "Hainan";
+                    string condition = "NE";
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "condition", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        condition = string.IsNullOrEmpty(row.ItemArray[11].ToString().Trim()) ? "NE" : row.ItemArray[11].ToString().Trim();
+                    }
+
+                    //AR – As Removed
+                    //NE – New Equipment
+                    //NS – New Surplus
+                    //OH – Overhauled
+                    //SV – Serviceable
+
+                    string certification = "FAA 8130 form 3";
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "certification", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        certification = string.IsNullOrEmpty(row.ItemArray[12].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[12].ToString().Trim();
+                    }
+
+                    int leadtime = 3;
+                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "Lead Time", StringComparison.InvariantCultureIgnoreCase) == true))
+                    {
+                        leadtime = Convert.ToInt32(string.IsNullOrEmpty(row.ItemArray[13].ToString().Trim()) ? "2" : row.ItemArray[13].ToString().Trim());
+                    }
+
+                    string description = Regex.Replace(row.ItemArray[2].ToString(), @"[^\u0000-\u007F]", string.Empty);
+                    double price = Convert.ToDouble(row.ItemArray[6]);
+                    int qty = Convert.ToInt32(row.ItemArray[1]);
+
+
+                    //=IF(E2>=200,1,ROUNDUP(200/E2,0))
+                    int MOQ = 1;
+                    if (price == 0)
+                    {
+                        MOQ = 1;
+                    }
+                    else if (price >= 200)
+                    {
+                        MOQ = 1;
+                    }
+                    else
+                    {
+                        MOQ = Convert.ToInt32(200 / price) < qty ? Convert.ToInt32(200 / price) : qty;
+                    }
+
+
+                    StringBuilder sb = new StringBuilder();
+                    string note = "<li><b>Condition:</b> " + condition + "</li>" +
+                                        "<li>Comes with " + certification + " </li>" +
+                                        "<li>All parts are subject to prior sale </li>" +
+                                        "<li>Sale price is effective for available inventory only </li>" +
+                                        "<li><b>" + fob + "</b> </li>";
+
+                    sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
+                    sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
+                    sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
+                    sb.AppendFormat("{0}{1}", "", note);
+
+                    inventory.Handle = pn + "-" + vendorshort;
+                    inventory.Title = pn;
+                    inventory.Body__HTML_ = sb.ToString();
+                    inventory.Type = "Aircraft Parts";
+                    inventory.Tags = string.Join(",", description, vendor, inventory.Type, condition, pn);
+                    inventory.Published = true;
+                    inventory.Option1_Name = "Title";
+                    inventory.Option1_Value = "Default Title";
+                    inventory.Option2_Name = "Leadtime";
+                    inventory.Option2_Value = leadtime.ToString();
+                    inventory.Option3_Name = "MOQ";
+                    inventory.Option3_Value = MOQ;
+                    inventory.Original_Price = price;
+                    inventory.Variant_SKU = pn;
+                    inventory.Variant_Price = price;
+                    inventory.Variant_Inventory_Qty = qty;
+                    inventory.Variant_Taxable = false;
+                    inventory.Vendor = vendor;
+                    inventory.VendorShort = vendorshort;
+                    inventory.Lead_Time = leadtime;
+                    inventory.MOQ = MOQ;
+                    inventory.Condition = condition;
+                    inventory.Collection = collection;
+                    inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
+                    inventory.SEO_Description = inventory.SEO_Title;
+                    inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
+
+
+
+                    entityContext.Inventories.Add(inventory);
+                    entityContext.SaveChanges();
+
+                }
+            }
+        }
+
+        public static bool ContainsUnicodeCharacter(string input)
+        {
+            const int MaxAnsiCode = 255;
+
+            return input.Any(c => c > MaxAnsiCode);
+        }
 
         private static void GenerateShopify()
         {
