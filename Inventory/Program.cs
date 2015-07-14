@@ -7,6 +7,9 @@ using Excel;
 using System.IO;
 using System.Data;
 using System.Reflection;
+using CsvHelper.Configuration;
+using CsvHelper;
+using System.Globalization;
 
 namespace Inventory
 {
@@ -14,7 +17,24 @@ namespace Inventory
     {
         static void Main(string[] args)
         {
-            string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
+            switch (args[0])
+            {
+                case "I":
+                    Import();
+                    break;
+                case "O":
+                    GenerateShopify();
+                    break;
+                default:
+                    throw new Exception("Wrong parameter");
+            }
+        }
+
+        private static void Import()
+        {
+            //string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
+
+            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Hainan Airline", @"2015-06-23.xlsx");
 
             var excelData = new ExcelData(path);
             var sheets = excelData.getWorksheetNames();
@@ -30,17 +50,23 @@ namespace Inventory
 
                     Inventory inventory = new Inventory();
 
-                    string pn = row.ItemArray[0].ToString();
+                    string pn = row.ItemArray[0].ToString().Trim();
+
+                    if (string.IsNullOrEmpty(pn))
+                        continue;
+
                     string vendorshort = "hn";
                     string fob = "FOB China";
                     string vendor = "hainan";
                     string collection = "Hainan";
-                    string condition = "NS";
-                                //AR – As Removed
-                                //NE – New Equipment
-                                //NS – New Surplus
-                                //OH – Overhauled
-                                //SV – Serviceable
+                    string condition = string.IsNullOrEmpty(row.ItemArray[11].ToString().Trim()) ? "NE" : row.ItemArray[11].ToString().Trim();
+                    //AR – As Removed
+                    //NE – New Equipment
+                    //NS – New Surplus
+                    //OH – Overhauled
+                    //SV – Serviceable
+
+                    string certification = string.IsNullOrEmpty(row.ItemArray[12].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[12].ToString().Trim();
 
                     int leadtime = 3;
 
@@ -56,16 +82,16 @@ namespace Inventory
                     }
                     else
                     {
-                        MOQ = Convert.ToInt32((200 / Convert.ToDouble(row.ItemArray[4])) )> Convert.ToInt32(row.ItemArray[1]) ? Convert.ToInt32(200 / Convert.ToDouble(row.ItemArray[4])) : Convert.ToInt32(row.ItemArray[1]);
+                        MOQ = Convert.ToInt32((200 / Convert.ToDouble(row.ItemArray[4]))) > Convert.ToInt32(row.ItemArray[1]) ? Convert.ToInt32(200 / Convert.ToDouble(row.ItemArray[4])) : Convert.ToInt32(row.ItemArray[1]);
                     }
 
-                    inventory.Handle = pn + "-" + vendorshort;
-                    inventory.Title = pn;
+                    double price = Convert.ToDouble(row.ItemArray[6]);
+                    int qty = Convert.ToInt32(row.ItemArray[1]);
 
                     StringBuilder sb = new StringBuilder();
                     string description = row.ItemArray[2].ToString();
-                    string note ="<li><b>Condition:</b> FN </li>" +
-                                        "<li>Comes with FAA 8130 form 3 </li>" +
+                    string note = "<li><b>Condition:</b> " + condition + "</li>" +
+                                        "<li>Comes with " + certification + " </li>" +
                                         "<li>All parts are subject to prior sale </li>" +
                                         "<li>Sale price is effective for available inventory only </li>" +
                                         "<li><b>" + fob + "</b> </li>";
@@ -74,52 +100,32 @@ namespace Inventory
                     sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", inventory.Title, "<br>");
                     sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
                     sb.AppendFormat("{0}{1}", "", note);
+
+                    inventory.Handle = pn + "-" + vendorshort;
+                    inventory.Title = pn;
                     inventory.Body__HTML_ = sb.ToString();
-
                     inventory.Type = "Aircraft Parts";
-
                     inventory.Tags = string.Join(",", description, vendor, inventory.Type, condition, pn);
-
                     inventory.Published = true;
-
                     inventory.Option1_Name = "Title";
-
                     inventory.Option1_Value = "Default Title";
-
                     inventory.Option2_Name = "Leadtime";
-
                     inventory.Option2_Value = leadtime.ToString();
-
                     inventory.Option3_Name = "MOQ";
-
                     inventory.Option3_Value = MOQ;
-
-                    inventory.Original_Price = Convert.ToDouble(row.ItemArray[4]);
-
-                    inventory.Variant_SKU =pn;
-
-                    inventory.Variant_Price = Convert.ToDouble(row.ItemArray[4]);
-
-                    inventory.Variant_Inventory_Qty = Convert.ToInt32(row.ItemArray[1]);
-
+                    inventory.Original_Price = price;
+                    inventory.Variant_SKU = pn;
+                    inventory.Variant_Price = price;
+                    inventory.Variant_Inventory_Qty = qty;
                     inventory.Variant_Taxable = false;
-
                     inventory.Vendor = vendor;
-
                     inventory.VendorShort = vendorshort;
-
                     inventory.Lead_Time = leadtime;
-
                     inventory.MOQ = MOQ;
-
                     inventory.Condition = condition;
-
                     inventory.Collection = collection;
-
                     inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
-
                     inventory.SEO_Description = inventory.SEO_Title;
-
                     inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
 
 
@@ -133,6 +139,122 @@ namespace Inventory
             }
         }
 
+
+        private static void GenerateShopify()
+        {
+            #region retrieve records from db
+            TallamondEntities entityContext = new TallamondEntities();
+            int maxLineCount = 10000;
+            string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
+
+            var fileGroups = entityContext.Inventories.GroupBy(x => x.ID / maxLineCount);
+            //    .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
+            #endregion
+
+            int i = 0;
+            foreach (var grp in fileGroups)
+            {
+                string outfile = Path.Combine(Path.Combine(outputfolder, "Shopify_" + i++ + ".csv"));
+
+
+                #region transform files
+                //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
+                using (TextWriter writer = File.CreateText(outfile))
+                {
+                    using (var csvwriter = new CsvWriter(writer))
+                    {
+                        csvwriter.Configuration.RegisterClassMap<OutputShopifyMap>();
+
+
+                        csvwriter.WriteHeader<Inventory>();
+
+                        foreach (var record in grp)
+                        {
+                            //var record = csv.GetRecord<Input>();
+                            //Input record = csv.GetRecord<Input>();
+
+
+                            csvwriter.WriteRecord<Inventory>(record);
+                        }
+                    }
+                }
+                #endregion
+
+                //#region split the files if too big
+                //string[] filePaths = Directory.GetFiles(outputfolder);
+
+                //foreach (string file in filePaths)
+                //{
+                //    string f = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file));
+                //    Split(file, outputfolder);
+                //}
+                //#endregion
+            }
+        }
+
+
+        public static void Split(string inputfile, string outputfolder)
+        {
+            int maxLineCount = 5000;
+            FileInfo file = new FileInfo(inputfile);
+
+            var lines = File.ReadLines(inputfile).Take(1).ToArray();
+
+            var fileGroups = File.ReadLines(file.FullName)
+                .Select((l, i) => new { Line = l, Index = i })
+                .GroupBy(x => x.Index / maxLineCount)
+                .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
+
+            foreach (var grp in fileGroups)
+            {
+                if (!Directory.Exists(outputfolder + "_new"))
+                    Directory.CreateDirectory(outputfolder + "_new");
+
+                string f = Path.Combine(outputfolder + "_new", Path.GetFileNameWithoutExtension(inputfile) + "_" + grp.FileIndex + ".csv");
+
+                // Write headers for splitted file (Skip the first file)
+                if (grp.FileIndex > 0)
+                    File.WriteAllLines(f, lines);
+
+                File.AppendAllLines(f, grp.Lines);
+            }
+        }
+    }
+
+    public sealed class OutputShopifyMap : CsvClassMap<Inventory>
+    {
+        public OutputShopifyMap()
+        {
+            Map(m => m.Handle).Name("Handle");
+            Map(m => m.Title).Name("Title");
+            Map(m => m.Body__HTML_).Name("Body (HTML)");
+            //Map(m => m.Description).Name("Description");
+            Map(m => m.Original_Price).Name("Original Price");
+            Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);
+            Map(m => m.Vendor).Name("Vendor");
+            Map(m => m.VendorShort).Name("VendorShort");
+            Map(m => m.Lead_Time).Name("Lead Time");
+            Map(m => m.MOQ).Name("MOQ");
+            Map(m => m.Condition).Name("Condition");
+            Map(m => m.Type).Name("Type");
+            Map(m => m.Collection).Name("Collection");
+            Map(m => m.Variant_Price).Name("Variant Price");
+            Map(m => m.Variant_SKU).Name("Variant SKU");
+            Map(m => m.Variant_Taxable).Name("Variant Taxable");
+            Map(m => m.Option1_Name).Name("Option1 Name");
+            Map(m => m.Option1_Value).Name("Option1 Value");
+            Map(m => m.Option2_Name).Name("Option2 Name");
+            Map(m => m.Option2_Value).Name("Option2 Value");
+            Map(m => m.Option3_Name).Name("Option3 Name");
+            Map(m => m.Option3_Value).Name("Option3 Value");
+            Map(m => m.Tags).Name("Tags");
+            Map(m => m.SEO_Title).Name("SEO Title");
+            Map(m => m.SEO_Description).Name("SEO Description");
+            Map(m => m.Image_Src).Name("Image Src");
+            //Map(m => m.Note).Name("Note");
+            Map(m => m.Variant_Inventory_Qty).Name("Variant Inventory Qty");
+            //Map(m => m.).Name("Total Value");
+        }
     }
 
     public class ExcelData
