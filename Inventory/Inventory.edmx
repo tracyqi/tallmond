@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="TallamondModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Inventory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Handle" Type="nvarchar(max)" />
+          <Property Name="Title" Type="nvarchar(max)" />
+          <Property Name="Body (HTML)" Type="nvarchar(max)" />
+          <Property Name="Type" Type="nvarchar(max)" />
+          <Property Name="Tags" Type="nvarchar(max)" />
+          <Property Name="Published" Type="bit" Nullable="false" />
+          <Property Name="Option1 Name" Type="nvarchar(max)" />
+          <Property Name="Option1 Value" Type="nvarchar(max)" />
+          <Property Name="Option2 Name" Type="nvarchar(max)" />
+          <Property Name="Option2 Value" Type="nvarchar(max)" />
+          <Property Name="Option3 Name" Type="nvarchar(max)" />
+          <Property Name="Option3 Value" Type="float" />
+          <Property Name="Original Price" Type="float" />
+          <Property Name="Variant SKU" Type="nvarchar(max)" />
+          <Property Name="Variant Price" Type="float" />
+          <Property Name="Variant Inventory Qty" Type="float" />
+          <Property Name="Variant Taxable" Type="bit" />
+          <Property Name="Vendor" Type="nvarchar(max)" />
+          <Property Name="VendorShort" Type="nvarchar(max)" />
+          <Property Name="Lead Time" Type="int" />
+          <Property Name="MOQ" Type="int" />
+          <Property Name="Condition" Type="nvarchar(max)" />
+          <Property Name="Collection" Type="nvarchar(max)" />
+          <Property Name="SEO Title" Type="nvarchar(max)" />
+          <Property Name="SEO Description" Type="nvarchar(max)" />
+          <Property Name="Image Src" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityContainer Name="TallamondModelStoreContainer">
+          <EntitySet Name="Inventory" EntityType="Self.Inventory" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TallamondModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Inventory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Handle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Body__HTML_" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Type" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Published" Type="Boolean" Nullable="false" />
+          <Property Name="Option1_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Option1_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Option2_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Option2_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Option3_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Option3_Value" Type="Double" />
+          <Property Name="Original_Price" Type="Double" />
+          <Property Name="Variant_SKU" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Variant_Price" Type="Double" />
+          <Property Name="Variant_Inventory_Qty" Type="Double" />
+          <Property Name="Variant_Taxable" Type="Boolean" />
+          <Property Name="Vendor" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="VendorShort" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Lead_Time" Type="Int32" />
+          <Property Name="MOQ" Type="Int32" />
+          <Property Name="Condition" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Collection" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SEO_Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SEO_Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Image_Src" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="TallamondEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Inventories" EntityType="Self.Inventory" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TallamondModelStoreContainer" CdmEntityContainer="TallamondEntities">
+          <EntitySetMapping Name="Inventories">
+            <EntityTypeMapping TypeName="TallamondModel.Inventory">
+              <MappingFragment StoreEntitySet="Inventory">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Handle" ColumnName="Handle" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Body__HTML_" ColumnName="Body (HTML)" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Tags" ColumnName="Tags" />
+                <ScalarProperty Name="Published" ColumnName="Published" />
+                <ScalarProperty Name="Option1_Name" ColumnName="Option1 Name" />
+                <ScalarProperty Name="Option1_Value" ColumnName="Option1 Value" />
+                <ScalarProperty Name="Option2_Name" ColumnName="Option2 Name" />
+                <ScalarProperty Name="Option2_Value" ColumnName="Option2 Value" />
+                <ScalarProperty Name="Option3_Name" ColumnName="Option3 Name" />
+                <ScalarProperty Name="Option3_Value" ColumnName="Option3 Value" />
+                <ScalarProperty Name="Original_Price" ColumnName="Original Price" />
+                <ScalarProperty Name="Variant_SKU" ColumnName="Variant SKU" />
+                <ScalarProperty Name="Variant_Price" ColumnName="Variant Price" />
+                <ScalarProperty Name="Variant_Inventory_Qty" ColumnName="Variant Inventory Qty" />
+                <ScalarProperty Name="Variant_Taxable" ColumnName="Variant Taxable" />
+                <ScalarProperty Name="Vendor" ColumnName="Vendor" />
+                <ScalarProperty Name="VendorShort" ColumnName="VendorShort" />
+                <ScalarProperty Name="Lead_Time" ColumnName="Lead Time" />
+                <ScalarProperty Name="MOQ" ColumnName="MOQ" />
+                <ScalarProperty Name="Condition" ColumnName="Condition" />
+                <ScalarProperty Name="Collection" ColumnName="Collection" />
+                <ScalarProperty Name="SEO_Title" ColumnName="SEO Title" />
+                <ScalarProperty Name="SEO_Description" ColumnName="SEO Description" />
+                <ScalarProperty Name="Image_Src" ColumnName="Image Src" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
