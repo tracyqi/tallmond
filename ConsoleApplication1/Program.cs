@@ -7,12 +7,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Upload.Magento;
 
 namespace Upload
 {
     class Program
     {
         static void Main(string[] args)
+        {
+
+        }
+
+        private void Import()
         {
 
             string inputfoler = @"F:\Git\test\data\input";
@@ -181,6 +187,11 @@ namespace Upload
             #endregion
         }
 
+        //private static void Import2Magento()
+        //{
+        //    catalogProductCreateEntity 
+        //}
+
         public static void Split(string inputfile, string outputfolder)
         {
             int maxLineCount = 5000;
@@ -244,6 +255,7 @@ class InputMap : CsvClassMap<Input>
         Map(m => m.Option3).Name("Aircraft type");
         Map(m => m.FOB).Name("FOB");
         Map(m => m.LeadTime).Name("Lead time");
+        Map(m => m.Condition).Name("Condition");
 
     }
 }
@@ -322,7 +334,7 @@ public class OutputShopify
             sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", this.Description, "<br>");
             sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", this.Title, "<br>");
             sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
-            sb.AppendFormat("{0}{1}{2}", "", this.Note, "<br>");
+            sb.AppendFormat("{0}{1}", "", this.Note);
             return sb.ToString();
         }
     }        //(HTML)	
