@@ -296,7 +296,7 @@ namespace Inventory
             int maxLineCount = 10000;
             string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
 
-            var fileGroups = entityContext.Inventories.GroupBy(x => x.ID / maxLineCount);
+            var fileGroups = entityContext.Inventories.Where(o => o.Vendor == "hainan").GroupBy(x => x.ID / maxLineCount);
             //    .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
             #endregion
 
