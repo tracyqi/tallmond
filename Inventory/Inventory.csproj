@@ -59,42 +59,47 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Inventory.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Inventory.Context.tt</DependentUpon>
-    </Compile>
     <Compile Include="Inventory.cs">
-      <DependentUpon>Inventory.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Inventory.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Inventory.edmx</DependentUpon>
+      <DependentUpon>Tallamond.tt</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tallamond.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Tallamond.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Tallamond.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Tallamond.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Tallamond.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Tallamond.edmx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EntityDeploy Include="Inventory.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Inventory.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <None Include="Inventory.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Inventory.edmx</DependentUpon>
-      <LastGenOutput>Inventory.Context.cs</LastGenOutput>
-    </None>
-    <None Include="Inventory.edmx.diagram">
-      <DependentUpon>Inventory.edmx</DependentUpon>
-    </None>
-    <None Include="Inventory.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>Inventory.edmx</DependentUpon>
-      <LastGenOutput>Inventory1.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
+    <EntityDeploy Include="Tallamond.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Tallamond.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Tallamond.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Tallamond.edmx</DependentUpon>
+      <LastGenOutput>Tallamond.Context.cs</LastGenOutput>
+    </None>
+    <None Include="Tallamond.edmx.diagram">
+      <DependentUpon>Tallamond.edmx</DependentUpon>
+    </None>
+    <None Include="Tallamond.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Tallamond.edmx</DependentUpon>
+      <LastGenOutput>Tallamond.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

@@ -21,21 +21,23 @@
           <Property Name="Option2 Name" Type="nvarchar(max)" />
           <Property Name="Option2 Value" Type="nvarchar(max)" />
           <Property Name="Option3 Name" Type="nvarchar(max)" />
-          <Property Name="Option3 Value" Type="float" />
+          <Property Name="Option3 Value" Type="nvarchar(max)" />
           <Property Name="Original Price" Type="float" />
           <Property Name="Variant SKU" Type="nvarchar(max)" />
           <Property Name="Variant Price" Type="float" />
-          <Property Name="Variant Inventory Qty" Type="float" />
+          <Property Name="Variant Inventory Qty" Type="int" />
           <Property Name="Variant Taxable" Type="bit" />
           <Property Name="Vendor" Type="nvarchar(max)" />
           <Property Name="VendorShort" Type="nvarchar(max)" />
-          <Property Name="Lead Time" Type="int" />
-          <Property Name="MOQ" Type="int" />
+          <Property Name="Lead Time" Type="nvarchar(max)" />
+          <Property Name="MOQ" Type="varchar" MaxLength="50" />
           <Property Name="Condition" Type="nvarchar(max)" />
           <Property Name="Collection" Type="nvarchar(max)" />
           <Property Name="SEO Title" Type="nvarchar(max)" />
           <Property Name="SEO Description" Type="nvarchar(max)" />
           <Property Name="Image Src" Type="nvarchar(max)" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedDate" Type="datetime" />
         </EntityType>
         <EntityContainer Name="TallamondModelStoreContainer">
           <EntitySet Name="Inventory" EntityType="Self.Inventory" Schema="dbo" store:Type="Tables" />
@@ -61,21 +63,23 @@
           <Property Name="Option2_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Option2_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Option3_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option3_Value" Type="Double" />
+          <Property Name="Option3_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Original_Price" Type="Double" />
           <Property Name="Variant_SKU" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Variant_Price" Type="Double" />
-          <Property Name="Variant_Inventory_Qty" Type="Double" />
+          <Property Name="Variant_Inventory_Qty" Type="Int32" />
           <Property Name="Variant_Taxable" Type="Boolean" />
           <Property Name="Vendor" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="VendorShort" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Lead_Time" Type="Int32" />
-          <Property Name="MOQ" Type="Int32" />
+          <Property Name="Lead_Time" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="MOQ" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Condition" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Collection" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="SEO_Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="SEO_Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Image_Src" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityContainer Name="TallamondEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Inventories" EntityType="Self.Inventory" />
@@ -116,6 +120,8 @@
                 <ScalarProperty Name="SEO_Title" ColumnName="SEO Title" />
                 <ScalarProperty Name="SEO_Description" ColumnName="SEO Description" />
                 <ScalarProperty Name="Image_Src" ColumnName="Image Src" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

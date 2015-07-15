@@ -16,15 +16,27 @@ namespace Inventory
 {
     class Program
     {
+        private static int batchamount = 5000;
+
         static void Main(string[] args)
         {
             switch (args[0])
             {
                 case "I-hn":
-                    ImportHainan();
+                    Import(
+            "I",
+            @"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Hainan Airline\2015-06-23-formatted.xlsx",
+            "hainan",
+            "hn",
+            "hainan");
                     break;
                 case "I-ah":
-                    ImportAH();
+                    Import(
+            "I",
+            @"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Airbus Helicopters\Airbus-Helicopters-2015-formated.xlsx",
+            "Airbus Helicopters",
+            "ah",
+            "Airbus Helicopters");
                     break;
                 case "O":
                     GenerateShopify();
@@ -34,260 +46,174 @@ namespace Inventory
             }
         }
 
-        private static void ImportAH()
+        private static void Import(string operation,
+            string path,
+            string vendor,
+            string vendorshort,
+            string collection)
         {
-            //string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
-
-            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Airbus Helicopters\Airbus-Helicopters-2015.xlsx");
-
             var excelData = new ExcelData(path);
             var sheets = excelData.getWorksheetNames();
 
             TallamondEntities entityContext = new TallamondEntities();
 
-            foreach (var s in sheets)
-            {
-                var sheet = excelData.getData(s);
-                foreach (var row in sheet)
-                {
-                    Console.WriteLine(Environment.NewLine);
-
-                    Inventory inventory = new Inventory();
-
-                    string pn = row.ItemArray[0].ToString().Trim();
-
-                    if (string.IsNullOrEmpty(pn))
-                        continue;
-
-                    string vendorshort = "ah";
-                    string fob = "FOB Washington, USA ";
-                    string vendor = "Airbus Helicopters";
-                    string collection = "Airbus Helicopters";
-
-                    string condition = "NE";
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "condition", StringComparison.InvariantCultureIgnoreCase) == true))
-                    {
-                        condition = string.IsNullOrEmpty(row.ItemArray[7].ToString().Trim()) ? "NE" : row.ItemArray[7].ToString().Trim();
-                    }
-
-                    //AR – As Removed
-                    //NE – New Equipment
-                    //NS – New Surplus
-                    //OH – Overhauled
-                    //SV – Serviceable
-
-                    string certification = "FAA 8130 form 3";
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "certification", StringComparison.InvariantCultureIgnoreCase) == true))
-                    {
-                        certification = string.IsNullOrEmpty(row.ItemArray[8].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[8].ToString().Trim();
-                    }
-
-                    int leadtime = 2;
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "Lead Time", StringComparison.InvariantCultureIgnoreCase) == true))
-                    {
-                        leadtime = Convert.ToInt32(string.IsNullOrEmpty(row.ItemArray[9].ToString().Trim()) ? "2" : row.ItemArray[9].ToString().Trim());
-                    }
-
-                    string description = Regex.Replace(row.ItemArray[2].ToString(), @"[^\u0000-\u007F]", string.Empty);
-                        
-                        //ContainsUnicodeCharacter() ? row.ItemArray[2].ToString() : "N/A";
-                    double price = Convert.ToDouble(row.ItemArray[6]);
-                    int qty = Convert.ToInt32(row.ItemArray[3]);
-
-
-                    //=IF(E2>=200,1,ROUNDUP(200/E2,0))
-                    int MOQ = 1;
-                    if (price == 0)
-                    {
-                        MOQ = 1;
-                    }
-                    else if (price >= 200)
-                    {
-                        MOQ = 1;
-                    }
-                    else
-                    {
-                        MOQ = Convert.ToInt32(200 / price) < qty ? Convert.ToInt32(200 / price) : qty;
-                    }
-
-
-                    StringBuilder sb = new StringBuilder();
-                    string note = "<li><b>Condition:</b> " + condition + "</li>" +
-                                        "<li>Comes with " + certification + " </li>" +
-                                        "<li>All parts are subject to prior sale </li>" +
-                                        "<li>Sale price is effective for available inventory only </li>" +
-                                        "<li><b>" + fob + "</b> </li>";
-
-                    sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
-                    sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
-                    sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
-                    sb.AppendFormat("{0}{1}", "", note);
-
-                    inventory.Handle = pn + "-" + vendorshort;
-                    inventory.Title = pn;
-                    inventory.Body__HTML_ = sb.ToString();
-                    inventory.Type = "Aircraft Parts";
-                    inventory.Tags = string.Join(",", description, vendor, inventory.Type, condition, pn);
-                    inventory.Published = true;
-                    inventory.Option1_Name = "Title";
-                    inventory.Option1_Value = "Default Title";
-                    inventory.Option2_Name = "Leadtime";
-                    inventory.Option2_Value = leadtime.ToString();
-                    inventory.Option3_Name = "MOQ";
-                    inventory.Option3_Value = MOQ;
-                    inventory.Original_Price = price;
-                    inventory.Variant_SKU = pn;
-                    inventory.Variant_Price = price;
-                    inventory.Variant_Inventory_Qty = qty;
-                    inventory.Variant_Taxable = false;
-                    inventory.Vendor = vendor;
-                    inventory.VendorShort = vendorshort;
-                    inventory.Lead_Time = leadtime;
-                    inventory.MOQ = MOQ;
-                    inventory.Condition = condition;
-                    inventory.Collection = collection;
-                    inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
-                    inventory.SEO_Description = inventory.SEO_Title;
-                    inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
-
-
-
-                    entityContext.Inventories.Add(inventory);
-                    entityContext.SaveChanges();
-
-
-
-                }
-            }
-        }
-        private static void ImportHainan()
-        {
-            //string path = Path.Combine(System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath), @"2015-06-23.xlsx");
-
-            string path = Path.Combine(@"C:\Users\tracyqi.REDMOND\Google Drive\DOCUMENT\Inventory\InstockFromSuppliers\Hainan Airline", @"2015-06-23.xlsx");
-
-            var excelData = new ExcelData(path);
-            var sheets = excelData.getWorksheetNames();
-
-            TallamondEntities entityContext = new TallamondEntities();
+            //	DESCRIPTION	OriginalPrice	FinalPrice	SpecialPrice	
+            //PartNumber	Quantity Condition	Certificate	FOB	LeadTime																																																																																																																																																																																																																																																				
+            //15945	4		106	169.6	0			FOB China	3-5 days																																																																																																																																																																																																																																																				
 
             foreach (var s in sheets)
             {
+                Console.WriteLine("Importing from Sheet {0}:", s);
                 var sheet = excelData.getData(s);
-                foreach (var row in sheet)
+                //int i = 0;
+
+                // batch upload
+                var data = sheet
+                     .Select((l, i) => new { Line = l, Index = i })
+                     .GroupBy(x => x.Index / batchamount)
+                     .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
+
+
+                foreach (var d in data)
                 {
-                    Console.WriteLine(Environment.NewLine);
+                    List<Inventory> inventories = new List<Inventory>();
 
-                    Inventory inventory = new Inventory();
-
-                    string pn = row.ItemArray[0].ToString().Trim();
-
-                    if (string.IsNullOrEmpty(pn))
-                        continue;
-
-                    string vendorshort = "hn";
-                    string fob = "FOB China";
-                    string vendor = "hainan";
-                    string collection = "Hainan";
-                    string condition = "NE";
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "condition", StringComparison.InvariantCultureIgnoreCase) == true))
+                    foreach (var row in d.Lines)
                     {
-                        condition = string.IsNullOrEmpty(row.ItemArray[11].ToString().Trim()) ? "NE" : row.ItemArray[11].ToString().Trim();
+                        #region insert record
+                        Inventory inventory = new Inventory();
+
+                        int index = row.Table.Columns.IndexOf("PartNumber");
+                        string pn = row.ItemArray[index].ToString().Trim();
+                        if (string.IsNullOrEmpty(pn))
+                            continue;
+
+                        int qty = 0;
+                        index = row.Table.Columns.IndexOf("Quantity");
+                        if (index >= 0)
+                        {
+                            qty = Convert.ToInt32(row.ItemArray[index].ToString().Trim());
+                        }
+
+                        string description = string.Empty;
+                        index = row.Table.Columns.IndexOf("DESCRIPTION");
+                        if (index >= 0)
+                        {
+                            string dec = row.ItemArray[index].ToString().Trim();
+                            description = Regex.Replace(dec, @"[^\u0000-\u007F]", string.Empty);
+                        }
+
+                        double finalPrice = 0;
+                        index = row.Table.Columns.IndexOf("FinalPrice");
+                        if (index >= 0)
+                        {
+                            finalPrice = Convert.ToDouble(row.ItemArray[index].ToString().Trim());
+                        }
+
+                        double originalPrice = 0;
+                        index = row.Table.Columns.IndexOf("OriginalPrice");
+                        if (index >= 0)
+                        {
+                            originalPrice = Convert.ToDouble(row.ItemArray[index].ToString().Trim());
+                        }
+
+
+                        //AR – As Removed
+                        //NE – New Equipment
+                        //NS – New Surplus
+                        //OH – Overhauled
+                        //SV – Serviceable
+                        string defaultCondition = "NE";
+                        index = row.Table.Columns.IndexOf("Condition");
+                        if (index >= 0)
+                        {
+                            defaultCondition = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCondition : row.ItemArray[index].ToString().Trim();
+                        }
+
+                        string defaultCerts = "FAA 8130 form 3";
+                        index = row.Table.Columns.IndexOf("Certificate");
+                        if (index >= 0)
+                        {
+                            defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[index].ToString().Trim();
+                        }
+
+                        string defaultLeadtime = "3-5 days";
+                        index = row.Table.Columns.IndexOf("LeadTime");
+                        if (index >= 0)
+                        {
+                            defaultLeadtime = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
+                        }
+
+                        string defaultFob = "FOB Washington, USA ";
+                        index = row.Table.Columns.IndexOf("FOB");
+                        if (index >= 0)
+                        {
+                            defaultFob = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
+                        }
+
+                        string defaultMOQ = "$200";
+                        index = row.Table.Columns.IndexOf("MOQ");
+                        if (index >= 0)
+                        {
+                            defaultMOQ = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
+                        }
+
+
+                        StringBuilder sb = new StringBuilder();
+                        string note = "<li><b>Condition:</b> " + defaultCondition + "</li>" +
+                                            "<li>Comes with " + defaultCerts + " </li>" +
+                                            "<li>All parts are subject to prior sale </li>" +
+                                            ((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
+                                            "<li>Sale price is effective for available inventory only </li>" +
+                                            "<li><b>" + defaultFob + "</b> </li>";
+
+                        sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
+                        sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
+                        sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
+                        sb.AppendFormat("{0}{1}", "", note);
+
+                        inventory.Handle = pn + "-" + vendorshort;
+                        inventory.Title = pn;
+                        inventory.Body__HTML_ = sb.ToString();
+                        inventory.Type = "Aircraft Parts";
+                        inventory.Tags = string.Join(",", description, vendor, inventory.Type, defaultCondition, pn);
+                        inventory.Published = true;
+                        inventory.Option1_Name = "Title";
+                        inventory.Option1_Value = "Default Title";
+                        inventory.Option2_Name = "Leadtime";
+                        inventory.Option2_Value = defaultLeadtime;
+                        inventory.Option3_Name = "MOQ";
+                        inventory.Option3_Value = defaultMOQ;
+                        inventory.Original_Price = originalPrice;
+                        inventory.Variant_SKU = pn;
+                        inventory.Variant_Price = finalPrice;
+                        inventory.Variant_Inventory_Qty = qty;
+                        inventory.Variant_Taxable = false;
+                        inventory.Vendor = vendor;
+                        inventory.VendorShort = vendorshort;
+                        inventory.Lead_Time = defaultLeadtime;
+                        inventory.MOQ = defaultMOQ;
+                        inventory.Condition = defaultCondition;
+                        inventory.Collection = collection;
+                        inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
+                        inventory.SEO_Description = inventory.SEO_Title;
+                        //inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
+
+
+                        inventories.Add(inventory);
+                        #endregion
+
                     }
 
-                    //AR – As Removed
-                    //NE – New Equipment
-                    //NS – New Surplus
-                    //OH – Overhauled
-                    //SV – Serviceable
-
-                    string certification = "FAA 8130 form 3";
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "certification", StringComparison.InvariantCultureIgnoreCase) == true))
-                    {
-                        certification = string.IsNullOrEmpty(row.ItemArray[12].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[12].ToString().Trim();
-                    }
-
-                    int leadtime = 3;
-                    if (row.ItemArray.Any(o => string.Equals(o.ToString(), "Lead Time", StringComparison.InvariantCultureIgnoreCase) == true))
-                    {
-                        leadtime = Convert.ToInt32(string.IsNullOrEmpty(row.ItemArray[13].ToString().Trim()) ? "2" : row.ItemArray[13].ToString().Trim());
-                    }
-
-                    string description = Regex.Replace(row.ItemArray[2].ToString(), @"[^\u0000-\u007F]", string.Empty);
-                    double price = Convert.ToDouble(row.ItemArray[6]);
-                    int qty = Convert.ToInt32(row.ItemArray[1]);
-
-
-                    //=IF(E2>=200,1,ROUNDUP(200/E2,0))
-                    int MOQ = 1;
-                    if (price == 0)
-                    {
-                        MOQ = 1;
-                    }
-                    else if (price >= 200)
-                    {
-                        MOQ = 1;
-                    }
-                    else
-                    {
-                        MOQ = Convert.ToInt32(200 / price) < qty ? Convert.ToInt32(200 / price) : qty;
-                    }
-
-
-                    StringBuilder sb = new StringBuilder();
-                    string note = "<li><b>Condition:</b> " + condition + "</li>" +
-                                        "<li>Comes with " + certification + " </li>" +
-                                        "<li>All parts are subject to prior sale </li>" +
-                                        "<li>Sale price is effective for available inventory only </li>" +
-                                        "<li><b>" + fob + "</b> </li>";
-
-                    sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
-                    sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
-                    sb.AppendFormat("{0}{1}", "<b> Note:</b>", "<br>");
-                    sb.AppendFormat("{0}{1}", "", note);
-
-                    inventory.Handle = pn + "-" + vendorshort;
-                    inventory.Title = pn;
-                    inventory.Body__HTML_ = sb.ToString();
-                    inventory.Type = "Aircraft Parts";
-                    inventory.Tags = string.Join(",", description, vendor, inventory.Type, condition, pn);
-                    inventory.Published = true;
-                    inventory.Option1_Name = "Title";
-                    inventory.Option1_Value = "Default Title";
-                    inventory.Option2_Name = "Leadtime";
-                    inventory.Option2_Value = leadtime.ToString();
-                    inventory.Option3_Name = "MOQ";
-                    inventory.Option3_Value = MOQ;
-                    inventory.Original_Price = price;
-                    inventory.Variant_SKU = pn;
-                    inventory.Variant_Price = price;
-                    inventory.Variant_Inventory_Qty = qty;
-                    inventory.Variant_Taxable = false;
-                    inventory.Vendor = vendor;
-                    inventory.VendorShort = vendorshort;
-                    inventory.Lead_Time = leadtime;
-                    inventory.MOQ = MOQ;
-                    inventory.Condition = condition;
-                    inventory.Collection = collection;
-                    inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
-                    inventory.SEO_Description = inventory.SEO_Title;
-                    inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
-
-
-
-                    entityContext.Inventories.Add(inventory);
+                    entityContext.Inventories.AddRange(inventories);
                     entityContext.SaveChanges();
 
                 }
+                Console.WriteLine("----- Total Count:", sheet.Count());
+
             }
         }
 
-        public static bool ContainsUnicodeCharacter(string input)
-        {
-            const int MaxAnsiCode = 255;
-
-            return input.Any(c => c > MaxAnsiCode);
-        }
 
         private static void GenerateShopify()
         {
@@ -296,9 +222,8 @@ namespace Inventory
             int maxLineCount = 10000;
             string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
 
-            var vendors = entityContext.Inventories.GroupBy(x =>x.Vendor);
+            var vendors = entityContext.Inventories.GroupBy(x => x.Vendor);
 
-            //    .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
             #endregion
 
             int i = 0;
@@ -307,7 +232,7 @@ namespace Inventory
                 var fileGroups = ven.GroupBy(x => x.ID / maxLineCount);
                 foreach (var grp in fileGroups)
                 {
-                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_"+ "Shopify_" + i++ + ".csv"));
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Shopify_" + i++ + ".csv"));
 
 
                     #region transform files
@@ -323,54 +248,12 @@ namespace Inventory
 
                             foreach (var record in grp)
                             {
-                                //var record = csv.GetRecord<Input>();
-                                //Input record = csv.GetRecord<Input>();
-
-
                                 csvwriter.WriteRecord<Inventory>(record);
                             }
                         }
                     }
                     #endregion
-
-                    //#region split the files if too big
-                    //string[] filePaths = Directory.GetFiles(outputfolder);
-
-                    //foreach (string file in filePaths)
-                    //{
-                    //    string f = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file));
-                    //    Split(file, outputfolder);
-                    //}
-                    //#endregion
                 }
-            }
-        }
-
-
-        public static void Split(string inputfile, string outputfolder)
-        {
-            int maxLineCount = 5000;
-            FileInfo file = new FileInfo(inputfile);
-
-            var lines = File.ReadLines(inputfile).Take(1).ToArray();
-
-            var fileGroups = File.ReadLines(file.FullName)
-                .Select((l, i) => new { Line = l, Index = i })
-                .GroupBy(x => x.Index / maxLineCount)
-                .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
-
-            foreach (var grp in fileGroups)
-            {
-                if (!Directory.Exists(outputfolder + "_new"))
-                    Directory.CreateDirectory(outputfolder + "_new");
-
-                string f = Path.Combine(outputfolder + "_new", Path.GetFileNameWithoutExtension(inputfile) + "_" + grp.FileIndex + ".csv");
-
-                // Write headers for splitted file (Skip the first file)
-                if (grp.FileIndex > 0)
-                    File.WriteAllLines(f, lines);
-
-                File.AppendAllLines(f, grp.Lines);
             }
         }
     }
@@ -462,5 +345,14 @@ namespace Inventory
             var rows = from DataRow a in workSheet.Rows select a;
             return rows;
         }
+
+        public int getColumnIndex(string sheet, string columnName)
+        {
+            var reader = this.getExcelReader();
+            var workSheet = reader.AsDataSet().Tables[sheet];
+            return workSheet.Columns.IndexOf(columnName);
+        }
+
+
     }
 }
