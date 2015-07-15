@@ -296,48 +296,53 @@ namespace Inventory
             int maxLineCount = 10000;
             string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
 
-            var fileGroups = entityContext.Inventories.Where(o => o.Vendor == "hainan").GroupBy(x => x.ID / maxLineCount);
+            var vendors = entityContext.Inventories.GroupBy(x =>x.Vendor);
+
             //    .Select(grp => new { FileIndex = grp.Key, Lines = grp.Select(x => x.Line) });
             #endregion
 
             int i = 0;
-            foreach (var grp in fileGroups)
+            foreach (var ven in vendors)
             {
-                string outfile = Path.Combine(Path.Combine(outputfolder, "Shopify_" + i++ + ".csv"));
-
-
-                #region transform files
-                //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
-                using (TextWriter writer = File.CreateText(outfile))
+                var fileGroups = ven.GroupBy(x => x.ID / maxLineCount);
+                foreach (var grp in fileGroups)
                 {
-                    using (var csvwriter = new CsvWriter(writer))
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_"+ "Shopify_" + i++ + ".csv"));
+
+
+                    #region transform files
+                    //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
+                    using (TextWriter writer = File.CreateText(outfile))
                     {
-                        csvwriter.Configuration.RegisterClassMap<OutputShopifyMap>();
-
-
-                        csvwriter.WriteHeader<Inventory>();
-
-                        foreach (var record in grp)
+                        using (var csvwriter = new CsvWriter(writer))
                         {
-                            //var record = csv.GetRecord<Input>();
-                            //Input record = csv.GetRecord<Input>();
+                            csvwriter.Configuration.RegisterClassMap<OutputShopifyMap>();
 
 
-                            csvwriter.WriteRecord<Inventory>(record);
+                            csvwriter.WriteHeader<Inventory>();
+
+                            foreach (var record in grp)
+                            {
+                                //var record = csv.GetRecord<Input>();
+                                //Input record = csv.GetRecord<Input>();
+
+
+                                csvwriter.WriteRecord<Inventory>(record);
+                            }
                         }
                     }
+                    #endregion
+
+                    //#region split the files if too big
+                    //string[] filePaths = Directory.GetFiles(outputfolder);
+
+                    //foreach (string file in filePaths)
+                    //{
+                    //    string f = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file));
+                    //    Split(file, outputfolder);
+                    //}
+                    //#endregion
                 }
-                #endregion
-
-                //#region split the files if too big
-                //string[] filePaths = Directory.GetFiles(outputfolder);
-
-                //foreach (string file in filePaths)
-                //{
-                //    string f = Path.Combine(outputfolder, Path.GetFileNameWithoutExtension(file));
-                //    Split(file, outputfolder);
-                //}
-                //#endregion
             }
         }
 
