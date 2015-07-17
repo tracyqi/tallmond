@@ -137,7 +137,7 @@ namespace Inventory
                             defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[index].ToString().Trim();
                         }
 
-                        string defaultLeadtime = "3-5 days";
+                        string defaultLeadtime = "3-5 ";
                         index = row.Table.Columns.IndexOf("LeadTime");
                         if (index >= 0)
                         {
@@ -148,14 +148,14 @@ namespace Inventory
                         index = row.Table.Columns.IndexOf("FOB");
                         if (index >= 0)
                         {
-                            defaultFob = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
+                            defaultFob = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultFob : row.ItemArray[index].ToString().Trim();
                         }
 
                         string defaultMOQ = "$200";
                         index = row.Table.Columns.IndexOf("MOQ");
                         if (index >= 0)
                         {
-                            defaultMOQ = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
+                            defaultMOQ = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultMOQ : row.ItemArray[index].ToString().Trim();
                         }
 
 
@@ -163,7 +163,7 @@ namespace Inventory
                         string note = "<li><b>Condition:</b> " + defaultCondition + "</li>" +
                                             "<li>Comes with " + defaultCerts + " </li>" +
                                             "<li>All parts are subject to prior sale </li>" +
-                                            ((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
+                                            //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
                                             "<li>Sale price is effective for available inventory only </li>" +
                                             "<li><b>" + defaultFob + "</b> </li>";
 
