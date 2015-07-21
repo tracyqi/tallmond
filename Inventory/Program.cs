@@ -41,6 +41,9 @@ namespace Inventory
                 case "O":
                     GenerateShopify();
                     break;
+                case "OM":
+                    GenerateShopify(1);
+                    break;
                 default:
                     throw new Exception("Wrong parameter");
             }
@@ -215,14 +218,15 @@ namespace Inventory
         }
 
 
-        private static void GenerateShopify()
+        private static void GenerateShopify(int days =0)
         {
             #region retrieve records from db
             TallamondEntities entityContext = new TallamondEntities();
             int maxLineCount = 10000;
             string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
 
-            var vendors = entityContext.Inventories.GroupBy(x => x.Vendor);
+            DateTime modDate = DateTime.Now.AddDays(days * -1);
+            var vendors = entityContext.Inventories.Where(o => o.ModifiedDate > modDate).GroupBy(x => x.Vendor);
 
             #endregion
 
