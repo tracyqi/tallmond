@@ -139,6 +139,11 @@ namespace Inventory
                         {
                             defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[index].ToString().Trim();
                         }
+                        // Special rule, NS means no Cersts
+                        if (defaultCondition == "NS")
+                        {
+                            defaultCerts = string.Empty;
+                        }
 
                         string defaultLeadtime = "3-5 ";
                         index = row.Table.Columns.IndexOf("LeadTime");
@@ -164,7 +169,7 @@ namespace Inventory
 
                         StringBuilder sb = new StringBuilder();
                         string note = "<li><b>Condition:</b> " + defaultCondition + "</li>" +
-                                            "<li>Comes with " + defaultCerts + " </li>" +
+                                            (string.IsNullOrEmpty(defaultCerts) ? "":("<li>Comes with " + defaultCerts + " </li>") )+
                                             "<li>All parts are subject to prior sale </li>" +
                                             //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
                                             "<li>Sale price is effective for available inventory only </li>" +
