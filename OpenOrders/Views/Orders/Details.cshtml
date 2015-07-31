@@ -1,0 +1,114 @@
+﻿@model OpenOrders.Models.Order
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CustomerPONum)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CustomerPONum)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CustomerPOCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CustomerPOCreated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CustomerInvoiceNum)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CustomerInvoiceNum)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CustomerInvoiceCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CustomerInvoiceCreated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MfrPONum)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MfrPONum)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MfrPOCreated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MfrPOCreated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MfrInvoiceNum)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MfrInvoiceNum)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MfrInvoiceDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MfrInvoiceDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NextFollowupDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NextFollowupDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Note)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Note)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Owner)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Owner)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

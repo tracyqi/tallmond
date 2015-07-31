@@ -1,0 +1,124 @@
+﻿@model IEnumerable<OpenOrders.Models.Order>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.CustomerPONum)*@
+            Customer PO#
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.CustomerPOCreated)*@
+            Customer PO Date
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.CustomerInvoiceNum)*@
+            Customer Invoice #
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.CustomerInvoiceCreated)*@
+            Customer Invoice Date
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.MfrPONum)*@
+            Mfr PO #
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.MfrPOCreated)*@
+            Mfr PO Date
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.MfrInvoiceNum)*@
+            Mfr Invoice #
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.MfrInvoiceDate)*@
+            Mfr Invoice Date
+        </th>
+        <th>
+            @*@Html.DisplayNameFor(model => model.NextFollowupDate)*@
+            Next Followup Date
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+           
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Note)
+            
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Owner)
+            
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @if (item.NextFollowupDate <= DateTime.Now) { 
+                @: <font color="red">&#33;</font>
+            }
+</td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CustomerPONum)
+        </td>
+        <td>
+            @*@Html.EditorFor(modelItem => item.CustomerPOCreated.ToString("MM/dd/yyyy"))*@
+            @item.CustomerPOCreated.ToString("MM/dd/yyyy")
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CustomerInvoiceNum)
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.CustomerInvoiceCreated)*@
+            @item.CustomerInvoiceCreated.ToString("MM/dd/yyyy")
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MfrPONum)
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.MfrPOCreated)*@
+            @item.MfrPOCreated.ToString("MM/dd/yyyy")
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MfrInvoiceNum)
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.MfrInvoiceDate)*@
+            @item.MfrInvoiceDate.ToString("MM/dd/yyyy")
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.NextFollowupDate)*@
+            @item.MfrInvoiceDate.ToString("MM/dd/yyyy")
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Status)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Note)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Owner)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID })
+            @*@Html.ActionLink("Details", "Details", new { id=item.ID }) |*@
+            @*@Html.ActionLink("Delete", "Delete", new { id=item.ID })*@
+        </td>
+    </tr>
+}
+
+</table>
