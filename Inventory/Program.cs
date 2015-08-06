@@ -168,12 +168,12 @@ namespace Inventory
 
 
                         StringBuilder sb = new StringBuilder();
-                        string note = "<li><b>Condition:</b> " + defaultCondition + "</li>" +
-                                            (string.IsNullOrEmpty(defaultCerts) ? "":("<li>Comes with " + defaultCerts + " </li>") )+
-                                            "<li>All parts are subject to prior sale </li>" +
+                        string note = "<li><b>Condition:</b> " + defaultCondition + "</li> " +
+                                            (string.IsNullOrEmpty(defaultCerts) ? "":("<li>Comes with " + defaultCerts + " </li> ") )+
+                                            "<li>All parts are subject to prior sale </li> " +
                                             //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
-                                            "<li>Sale price is effective for available inventory only </li>" +
-                                            "<li><b>" + defaultFob + "</b> </li>";
+                                            "<li>Sale price is effective for available inventory only </li> " +
+                                            "<li><b>" + defaultFob + "</b> </li> ";
 
                         sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
                         sb.AppendFormat("{0}{1}{2}", "<b>Part Number: </b>", pn, "<br>");
