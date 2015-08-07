@@ -228,10 +228,12 @@ namespace Inventory
             #region retrieve records from db
             TallamondEntities entityContext = new TallamondEntities();
             int maxLineCount = 10000;
-            string outputfolder = @"F:\Git\TallamondProduct\Inventory\Inventory\bin";
+            string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
+
+            string outputfolder = Path.GetDirectoryName(theDirectory);
 
             DateTime modDate = DateTime.Now.AddDays(days * -1);
-            var vendors = entityContext.Inventories.Where(o => o.ModifiedDate > modDate).GroupBy(x => x.Vendor);
+            var vendors = entityContext.Inventories.Where(o => o.ModifiedDate > modDate && o.Published).GroupBy(x => x.Vendor);
 
             #endregion
 
@@ -287,12 +289,12 @@ namespace Inventory
             Map(m => m.Variant_Price).Name("Variant Price");
             Map(m => m.Variant_SKU).Name("Variant SKU");
             Map(m => m.Variant_Taxable).Name("Variant Taxable");
-            Map(m => m.Option1_Name).Name("Option1 Name");
-            Map(m => m.Option1_Value).Name("Option1 Value");
-            Map(m => m.Option2_Name).Name("Option2 Name");
-            Map(m => m.Option2_Value).Name("Option2 Value");
-            Map(m => m.Option3_Name).Name("Option3 Name");
-            Map(m => m.Option3_Value).Name("Option3 Value");
+            //Map(m => m.Option1_Name).Name("Option1 Name");
+            //Map(m => m.Option1_Value).Name("Option1 Value");
+            //Map(m => m.Option2_Name).Name("Option2 Name");
+            //Map(m => m.Option2_Value).Name("Option2 Value");
+            //Map(m => m.Option3_Name).Name("Option3 Name");
+            //Map(m => m.Option3_Value).Name("Option3 Value");
             Map(m => m.Tags).Name("Tags");
             Map(m => m.SEO_Title).Name("SEO Title");
             Map(m => m.SEO_Description).Name("SEO Description");
