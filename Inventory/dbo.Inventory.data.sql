@@ -12,8 +12,8 @@ group by condition
 select top 10 *
  
 update dbo.Inventory 
- set [Body (HTML)] = replace([Body (HTML)], '<li>Comes with No </li>', '') 
- where [Body (HTML)] like '%<b>Condition:</b> NS%'
+ set [Body (HTML)] =  [Body (HTML)]  + '<li>Lead time is 5-7 days days based on available inventory</li>' --replace([Body (HTML)], '<li>Comes with No </li>', '') 
+ --where [Body (HTML)] like '%<b>Condition:</b> NS%'
  
  select * from dbo.Inventory
  where condition ='NE'
@@ -21,7 +21,11 @@ update dbo.Inventory
 select * from dbo.inventory
  where [Body (HTML)] like '%<b>Condition:</b> NS%'
 
--- <b>Description: </b>MARKER<br><b>Part Number: </b>00033031-7<br><b> Note:</b><br><li><b>Condition:</b> NS</li><li>Comes with FAA 8130 form 3 </li><li>All parts are subject to prior sale </li><li>Sale price is effective for available inventory only </li><li><b>FOB China</b> </li>
+-- <b>Description: </b>MARKER<br><b>Part Number: </b>00033031-7<br><b> 
+-- Note:</b><br><li><b>Condition:</b> NS</li><li>Comes with FAA 8130 form 3 </li><li>All parts are subject to prior sale </li>
+-- <li>Sale price is effective for available inventory only </li>
+-- <li><b>FOB China</b> </li>
+
 -- <b>Description: </b>OVERINFLATION PLUG<br><b>Part Number: </b>49-285<br><b> Note:</b><br><li><b>Condition:</b> NS</li><li>Comes with No </li><li>All parts are subject to prior sale </li><li>Sale price is effective for available inventory only </li><li><b>FOB China</b> </li>
 update dbo.Inventory
 set [Option3 Value] = '$150', Moq = '$150'
