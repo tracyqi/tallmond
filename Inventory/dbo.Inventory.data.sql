@@ -121,3 +121,11 @@ from dbo.Inventory
 where Vendor = 'hainan'
 and [Original Price] >=100
 and title = 'CL-4-BLPB-1.25S'
+
+select distinct vendor from dbo.inventory
+insert into [dbo].[Vendor]
+(Vendor)
+select distinct vendor 
+from dbo.inventory
+
+select * from dbo.vendor

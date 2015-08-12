@@ -241,20 +241,26 @@ namespace Inventory
         {
             #region retrieve records from db
             TallamondEntities entityContext = new TallamondEntities();
+
             int maxLineCount = 10000;
             string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
 
             string outputfolder = Path.GetDirectoryName(theDirectory);
 
             DateTime modDate = DateTime.Now.AddDays(days * -1);
-            var vendors = entityContext.Inventories.Where(o => o.ModifiedDate > modDate && o.Published).GroupBy(x => x.Vendor);
+
+            var vendors = entityContext.Vendors;
+
+
 
             #endregion
 
             int i = 0;
             foreach (var ven in vendors)
             {
-                var fileGroups = ven.GroupBy(x => x.ID / maxLineCount);
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published  && o.ModifiedDate >= modDate);
+
+                var fileGroups = inventories.GroupBy(x => x.ID / maxLineCount);
                 foreach (var grp in fileGroups)
                 {
                     string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Shopify_" + i++ + ".csv"));

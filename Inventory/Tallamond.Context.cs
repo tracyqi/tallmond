@@ -26,5 +26,6 @@ namespace Inventory
         }
     
         public virtual DbSet<Inventory> Inventories { get; set; }
+        public virtual DbSet<Vendor> Vendors { get; set; }
     }
 }

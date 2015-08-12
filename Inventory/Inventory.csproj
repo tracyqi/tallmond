@@ -79,6 +79,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Tallamond.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Vendor.cs">
+      <DependentUpon>Tallamond.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

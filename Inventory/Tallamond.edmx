@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="TallamondModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="TallamondModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Inventory">
           <Key>
             <PropertyRef Name="ID" />
@@ -27,8 +27,8 @@
           <Property Name="Variant Price" Type="float" />
           <Property Name="Variant Inventory Qty" Type="int" />
           <Property Name="Variant Taxable" Type="bit" />
-          <Property Name="Vendor" Type="nvarchar(max)" />
-          <Property Name="VendorShort" Type="nvarchar(max)" />
+          <Property Name="Vendor" Type="varchar" MaxLength="100" />
+          <Property Name="VendorShort" Type="varchar" MaxLength="100" />
           <Property Name="Lead Time" Type="nvarchar(max)" />
           <Property Name="MOQ" Type="varchar" MaxLength="50" />
           <Property Name="Condition" Type="nvarchar(max)" />
@@ -39,11 +39,19 @@
           <Property Name="CreatedDate" Type="datetime" />
           <Property Name="ModifiedDate" Type="datetime" />
         </EntityType>
+        <EntityType Name="Vendor">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="VendorName" Type="varchar" MaxLength="100" />
+          <Property Name="VendorShort" Type="varchar" MaxLength="100" />
+        </EntityType>
         <EntityContainer Name="TallamondModelStoreContainer">
           <EntitySet Name="Inventory" EntityType="Self.Inventory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Vendor" EntityType="Self.Vendor" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TallamondModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -69,8 +77,8 @@
           <Property Name="Variant_Price" Type="Double" />
           <Property Name="Variant_Inventory_Qty" Type="Int32" />
           <Property Name="Variant_Taxable" Type="Boolean" />
-          <Property Name="Vendor" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="VendorShort" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Vendor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="VendorShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Lead_Time" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="MOQ" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Condition" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -83,7 +91,16 @@
         </EntityType>
         <EntityContainer Name="TallamondEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Inventories" EntityType="Self.Inventory" />
+          <EntitySet Name="Vendors" EntityType="TallamondModel.Vendor" />
         </EntityContainer>
+        <EntityType Name="Vendor">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VendorName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="VendorShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -122,6 +139,15 @@
                 <ScalarProperty Name="Image_Src" ColumnName="Image Src" />
                 <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vendors">
+            <EntityTypeMapping TypeName="TallamondModel.Vendor">
+              <MappingFragment StoreEntitySet="Vendor">
+                <ScalarProperty Name="VendorShort" ColumnName="VendorShort" />
+                <ScalarProperty Name="VendorName" ColumnName="VendorName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
