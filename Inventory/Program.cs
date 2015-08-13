@@ -29,7 +29,7 @@ namespace Inventory
                     GenerateShopify();
                     break;
                 case "OM":
-                    GenerateShopify(1);
+                    GenerateShopify(100);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
@@ -56,6 +56,15 @@ namespace Inventory
                 //	DESCRIPTION	OriginalPrice	FinalPrice	SpecialPrice	
                 //PartNumber	Quantity Condition	Certificate	FOB	LeadTime																																																																																																																																																																																																																																																				
                 //15945	4		106	169.6	0			FOB China	3-5 days																																																																																																																																																																																																																																																				
+
+                // Insert vendor
+                var vendors = entityContext.Vendors.Where(o => string.Compare(o.VendorName, vendor, true) == 0);
+                if (vendors.Count() <= 0)
+                {
+                    Vendor v = new Vendor { VendorName = vendor, VendorShort = vendorshort };
+                    entityContext.Vendors.Add(v);
+                    entityContext.SaveChanges();
+                }
 
                 foreach (var s in sheets)
                 {
@@ -123,11 +132,11 @@ namespace Inventory
                                 else if (originalPrice < 1000)
                                     finalPrice = originalPrice * 1.2;
                                 else if (originalPrice < 3000)
-                                    finalPrice = originalPrice * 1.15;
+                                    finalPrice = originalPrice * 1.2;
                                 else if (originalPrice < 10000)
-                                    finalPrice = originalPrice * 1.1;
+                                    finalPrice = originalPrice * 1.15;
                                 else
-                                    finalPrice = originalPrice * 1.06;
+                                    finalPrice = originalPrice * 1.11;
 
                             }
                             finalPrice = Math.Round(finalPrice, 2);
@@ -163,7 +172,8 @@ namespace Inventory
                                 defaultLeadtime = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultLeadtime : row.ItemArray[index].ToString().Trim();
                             }
 
-                            string defaultFob = "FOB Washington, USA ";
+                            // FOB 
+                            string defaultFob = "";
                             index = row.Table.Columns.IndexOf("FOB");
                             if (index >= 0)
                             {
@@ -184,7 +194,7 @@ namespace Inventory
                                                 "<li>All parts are subject to prior sale </li> " +
                                                 //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
                                                 "<li>Sale price is effective for available inventory only </li> " +
-                                                "<li><b>" + defaultFob + "</b> </li> " +
+                                                (string.IsNullOrEmpty(defaultFob) ? "" : ("< li >< b > " + defaultFob + " </ b > </ li > ")) +                                                
                                                 "<li>Lead time is " + defaultLeadtime + " days based on available inventory </li> "
                                                 ;
 
