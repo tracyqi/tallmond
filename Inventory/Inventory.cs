@@ -14,13 +14,13 @@ namespace Inventory
     
     public partial class Inventory
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         public string Handle { get; set; }
         public string Title { get; set; }
         public string Body__HTML_ { get; set; }
         public string Type { get; set; }
         public string Tags { get; set; }
-        public bool Published { get; set; }
+        public Nullable<bool> Published { get; set; }
         public string Option1_Name { get; set; }
         public string Option1_Value { get; set; }
         public string Option2_Name { get; set; }
@@ -30,7 +30,8 @@ namespace Inventory
         public Nullable<double> Original_Price { get; set; }
         public string Variant_SKU { get; set; }
         public Nullable<double> Variant_Price { get; set; }
-        public Nullable<int> Variant_Inventory_Qty { get; set; }
+        public Nullable<int> Variant_Inventory { get; set; }
+        public Nullable<int> Qty { get; set; }
         public Nullable<bool> Variant_Taxable { get; set; }
         public string Vendor { get; set; }
         public string VendorShort { get; set; }

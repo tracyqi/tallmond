@@ -7,45 +7,46 @@
     <Schema Namespace="TallamondModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Inventory">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Handle" Type="nvarchar(max)" />
-          <Property Name="Title" Type="nvarchar(max)" />
-          <Property Name="Body (HTML)" Type="nvarchar(max)" />
-          <Property Name="Type" Type="nvarchar(max)" />
-          <Property Name="Tags" Type="nvarchar(max)" />
-          <Property Name="Published" Type="bit" Nullable="false" />
-          <Property Name="Option1 Name" Type="nvarchar(max)" />
-          <Property Name="Option1 Value" Type="nvarchar(max)" />
-          <Property Name="Option2 Name" Type="nvarchar(max)" />
-          <Property Name="Option2 Value" Type="nvarchar(max)" />
-          <Property Name="Option3 Name" Type="nvarchar(max)" />
-          <Property Name="Option3 Value" Type="nvarchar(max)" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Handle" Type="varchar" MaxLength="50" />
+          <Property Name="Title" Type="varchar" MaxLength="50" />
+          <Property Name="Body (HTML)" Type="varchar(max)" />
+          <Property Name="Type" Type="varchar(max)" />
+          <Property Name="Tags" Type="varchar(max)" />
+          <Property Name="Published" Type="bit" />
+          <Property Name="Option1 Name" Type="varchar" MaxLength="50" />
+          <Property Name="Option1 Value" Type="varchar" MaxLength="50" />
+          <Property Name="Option2 Name" Type="varchar" MaxLength="50" />
+          <Property Name="Option2 Value" Type="varchar" MaxLength="50" />
+          <Property Name="Option3 Name" Type="varchar" MaxLength="50" />
+          <Property Name="Option3 Value" Type="varchar" MaxLength="50" />
           <Property Name="Original Price" Type="float" />
-          <Property Name="Variant SKU" Type="nvarchar(max)" />
+          <Property Name="Variant SKU" Type="varchar" MaxLength="50" />
           <Property Name="Variant Price" Type="float" />
-          <Property Name="Variant Inventory Qty" Type="int" />
+          <Property Name="Variant Inventory" Type="int" />
+          <Property Name="Qty" Type="int" />
           <Property Name="Variant Taxable" Type="bit" />
-          <Property Name="Vendor" Type="varchar" MaxLength="100" />
-          <Property Name="VendorShort" Type="varchar" MaxLength="100" />
-          <Property Name="Lead Time" Type="nvarchar(max)" />
+          <Property Name="Vendor" Type="varchar" MaxLength="500" />
+          <Property Name="VendorShort" Type="varchar" MaxLength="10" />
+          <Property Name="Lead Time" Type="varchar" MaxLength="50" />
           <Property Name="MOQ" Type="varchar" MaxLength="50" />
-          <Property Name="Condition" Type="nvarchar(max)" />
-          <Property Name="Collection" Type="nvarchar(max)" />
-          <Property Name="SEO Title" Type="nvarchar(max)" />
-          <Property Name="SEO Description" Type="nvarchar(max)" />
-          <Property Name="Image Src" Type="nvarchar(max)" />
-          <Property Name="CreatedDate" Type="datetime" />
-          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="Condition" Type="varchar" MaxLength="50" />
+          <Property Name="Collection" Type="varchar" MaxLength="50" />
+          <Property Name="SEO Title" Type="varchar(max)" />
+          <Property Name="SEO Description" Type="varchar(max)" />
+          <Property Name="Image Src" Type="varchar(max)" />
+          <Property Name="CreatedDate" Type="smalldatetime" />
+          <Property Name="ModifiedDate" Type="smalldatetime" />
         </EntityType>
         <EntityType Name="Vendor">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="VendorName" Type="varchar" MaxLength="100" />
-          <Property Name="VendorShort" Type="varchar" MaxLength="100" />
+          <Property Name="VendorName" Type="varchar" MaxLength="50" />
+          <Property Name="VendorShort" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityContainer Name="TallamondModelStoreContainer">
           <EntitySet Name="Inventory" EntityType="Self.Inventory" Schema="dbo" store:Type="Tables" />
@@ -55,51 +56,52 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TallamondModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Inventory">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Handle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Body__HTML_" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Type" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Published" Type="Boolean" Nullable="false" />
-          <Property Name="Option1_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option1_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option2_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option2_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option3_Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Option3_Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Original_Price" Type="Double" />
-          <Property Name="Variant_SKU" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Variant_Price" Type="Double" />
-          <Property Name="Variant_Inventory_Qty" Type="Int32" />
-          <Property Name="Variant_Taxable" Type="Boolean" />
-          <Property Name="Vendor" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="VendorShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="Lead_Time" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="MOQ" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Condition" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Collection" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SEO_Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="SEO_Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Image_Src" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-        </EntityType>
         <EntityContainer Name="TallamondEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Inventories" EntityType="Self.Inventory" />
+          <EntitySet Name="Inventories" EntityType="TallamondModel.Inventory" />
           <EntitySet Name="Vendors" EntityType="TallamondModel.Vendor" />
         </EntityContainer>
+        <EntityType Name="Inventory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Handle" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Title" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Body__HTML_" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Type" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Tags" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Published" Type="Boolean" />
+          <Property Name="Option1_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Option1_Value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Option2_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Option2_Value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Option3_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Option3_Value" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Original_Price" Type="Double" />
+          <Property Name="Variant_SKU" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Variant_Price" Type="Double" />
+          <Property Name="Variant_Inventory" Type="Int32" />
+          <Property Name="Qty" Type="Int32" />
+          <Property Name="Variant_Taxable" Type="Boolean" />
+          <Property Name="Vendor" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="VendorShort" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Lead_Time" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MOQ" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Condition" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Collection" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SEO_Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="SEO_Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Image_Src" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="0" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="0" />
+        </EntityType>
         <EntityType Name="Vendor">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="VendorName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="VendorShort" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="VendorName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="VendorShort" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -110,35 +112,36 @@
           <EntitySetMapping Name="Inventories">
             <EntityTypeMapping TypeName="TallamondModel.Inventory">
               <MappingFragment StoreEntitySet="Inventory">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="Handle" ColumnName="Handle" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Body__HTML_" ColumnName="Body (HTML)" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Tags" ColumnName="Tags" />
-                <ScalarProperty Name="Published" ColumnName="Published" />
-                <ScalarProperty Name="Option1_Name" ColumnName="Option1 Name" />
-                <ScalarProperty Name="Option1_Value" ColumnName="Option1 Value" />
-                <ScalarProperty Name="Option2_Name" ColumnName="Option2 Name" />
-                <ScalarProperty Name="Option2_Value" ColumnName="Option2 Value" />
-                <ScalarProperty Name="Option3_Name" ColumnName="Option3 Name" />
-                <ScalarProperty Name="Option3_Value" ColumnName="Option3 Value" />
-                <ScalarProperty Name="Original_Price" ColumnName="Original Price" />
-                <ScalarProperty Name="Variant_SKU" ColumnName="Variant SKU" />
-                <ScalarProperty Name="Variant_Price" ColumnName="Variant Price" />
-                <ScalarProperty Name="Variant_Inventory_Qty" ColumnName="Variant Inventory Qty" />
-                <ScalarProperty Name="Variant_Taxable" ColumnName="Variant Taxable" />
-                <ScalarProperty Name="Vendor" ColumnName="Vendor" />
-                <ScalarProperty Name="VendorShort" ColumnName="VendorShort" />
-                <ScalarProperty Name="Lead_Time" ColumnName="Lead Time" />
-                <ScalarProperty Name="MOQ" ColumnName="MOQ" />
-                <ScalarProperty Name="Condition" ColumnName="Condition" />
-                <ScalarProperty Name="Collection" ColumnName="Collection" />
-                <ScalarProperty Name="SEO_Title" ColumnName="SEO Title" />
-                <ScalarProperty Name="SEO_Description" ColumnName="SEO Description" />
-                <ScalarProperty Name="Image_Src" ColumnName="Image Src" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
                 <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Image_Src" ColumnName="Image Src" />
+                <ScalarProperty Name="SEO_Description" ColumnName="SEO Description" />
+                <ScalarProperty Name="SEO_Title" ColumnName="SEO Title" />
+                <ScalarProperty Name="Collection" ColumnName="Collection" />
+                <ScalarProperty Name="Condition" ColumnName="Condition" />
+                <ScalarProperty Name="MOQ" ColumnName="MOQ" />
+                <ScalarProperty Name="Lead_Time" ColumnName="Lead Time" />
+                <ScalarProperty Name="VendorShort" ColumnName="VendorShort" />
+                <ScalarProperty Name="Vendor" ColumnName="Vendor" />
+                <ScalarProperty Name="Variant_Taxable" ColumnName="Variant Taxable" />
+                <ScalarProperty Name="Qty" ColumnName="Qty" />
+                <ScalarProperty Name="Variant_Inventory" ColumnName="Variant Inventory" />
+                <ScalarProperty Name="Variant_Price" ColumnName="Variant Price" />
+                <ScalarProperty Name="Variant_SKU" ColumnName="Variant SKU" />
+                <ScalarProperty Name="Original_Price" ColumnName="Original Price" />
+                <ScalarProperty Name="Option3_Value" ColumnName="Option3 Value" />
+                <ScalarProperty Name="Option3_Name" ColumnName="Option3 Name" />
+                <ScalarProperty Name="Option2_Value" ColumnName="Option2 Value" />
+                <ScalarProperty Name="Option2_Name" ColumnName="Option2 Name" />
+                <ScalarProperty Name="Option1_Value" ColumnName="Option1 Value" />
+                <ScalarProperty Name="Option1_Name" ColumnName="Option1 Name" />
+                <ScalarProperty Name="Published" ColumnName="Published" />
+                <ScalarProperty Name="Tags" ColumnName="Tags" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Body__HTML_" ColumnName="Body (HTML)" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Handle" ColumnName="Handle" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
