@@ -29,7 +29,7 @@ namespace Inventory
                     GenerateShopify();
                     break;
                 case "OM":
-                    GenerateShopify(1);
+                    GenerateShopify(180);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
