@@ -29,7 +29,7 @@ namespace Inventory
                     GenerateShopify();
                     break;
                 case "OM":
-                    GenerateShopify(180);
+                    GenerateShopify(1);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
@@ -53,18 +53,7 @@ namespace Inventory
 
                 TallamondEntities entityContext = new TallamondEntities();
 
-                //	DESCRIPTION	OriginalPrice	FinalPrice	SpecialPrice	
-                //PartNumber	Quantity Condition	Certificate	FOB	LeadTime																																																																																																																																																																																																																																																				
-                //15945	4		106	169.6	0			FOB China	3-5 days																																																																																																																																																																																																																																																				
-
-                // Insert vendor
-                var vendors = entityContext.Vendors.Where(o => string.Compare(o.VendorName, vendor, true) == 0);
-                if (vendors.Count() <= 0)
-                {
-                    Vendor v = new Vendor { VendorName = vendor, VendorShort = vendorshort };
-                    entityContext.Vendors.Add(v);
-                    entityContext.SaveChanges();
-                }
+                //PART NUMBER DESCRIPTION QTY U / M Price Condition   Cert Lead Time FOB
 
                 foreach (var s in sheets)
                 {
@@ -182,7 +171,7 @@ namespace Inventory
                                     defaultFob = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultFob : row.ItemArray[index].ToString().Trim();
                                 }
 
-                                string defaultMOQ = "$150";
+                                string defaultMOQ = "$300";
                                 index = row.Table.Columns.IndexOf("MOQ");
                                 if (index >= 0)
                                 {
@@ -196,7 +185,7 @@ namespace Inventory
                                                     "<li>All parts are subject to prior sale </li> " +
                                                     //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
                                                     "<li>Sale price is effective for available inventory only </li> " +
-                                                    (string.IsNullOrEmpty(defaultFob) ? "" : ("< li >< b > " + defaultFob + " </ b > </ li > ")) +
+                                                    (string.IsNullOrEmpty(defaultFob) ? "" : ("<li><b> " + defaultFob + " </b></li> ")) +
                                                     "<li>Lead time is " + defaultLeadtime + " days based on available inventory </li> "
                                                     ;
 
@@ -235,6 +224,7 @@ namespace Inventory
 
 
                                 inventories.Add(inventory);
+                                //if (entityContext.Inventories.)
                                 #endregion
                                 //entityContext.Inventories.Add(inventory);
                                 //entityContext.SaveChanges();
