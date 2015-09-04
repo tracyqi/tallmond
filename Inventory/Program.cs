@@ -29,7 +29,10 @@ namespace Inventory
                     GenerateShopify();
                     break;
                 case "OM":
-                    GenerateShopify(1);
+                    GenerateShopify(180);
+                    break;
+                case "OMG":
+                    GenerateGeneral(180);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
@@ -297,6 +300,58 @@ namespace Inventory
                 }
             }
         }
+
+        private static void GenerateGeneral(int days = 0)
+        {
+            #region retrieve records from db
+            TallamondEntities entityContext = new TallamondEntities();
+
+            int maxLineCount = 10000;
+            string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
+
+            string outputfolder = Path.GetDirectoryName(theDirectory);
+
+            DateTime modDate = DateTime.Now.AddDays(days * -1);
+
+            var vendors = entityContext.Vendors;
+
+
+
+            #endregion
+
+            int i = 0;
+            foreach (var ven in vendors)
+            {
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true && o.ModifiedDate >= modDate);
+
+                var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
+                foreach (var grp in fileGroups)
+                {
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Shopify_" + i++ + ".csv"));
+
+
+                    #region transform files
+                    //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
+                    using (TextWriter writer = File.CreateText(outfile))
+                    {
+                        using (var csvwriter = new CsvWriter(writer))
+                        {
+                            csvwriter.Configuration.RegisterClassMap<OutputGeneral>();
+
+
+                            csvwriter.WriteHeader<Inventory>();
+
+                            foreach (var record in grp)
+                            {
+                                csvwriter.WriteRecord<Inventory>(record);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+            }
+        }
+
     }
 
     public sealed class OutputShopifyMap : CsvClassMap<Inventory>
@@ -306,7 +361,7 @@ namespace Inventory
             Map(m => m.Handle).Name("Handle");
             Map(m => m.Title).Name("Title");
             Map(m => m.Body__HTML_).Name("Body (HTML)");
-            //Map(m => m.Description).Name("Description");
+            Map(m => m.SEO_Description).Name("Description");
             Map(m => m.Original_Price).Name("Original Price");
             Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);
             Map(m => m.Vendor).Name("Vendor");
@@ -334,6 +389,42 @@ namespace Inventory
             //Map(m => m.).Name("Total Value");
         }
     }
+
+    public sealed class OutputGeneral : CsvClassMap<Inventory>
+    {
+        public OutputGeneral()
+        {
+            Map(m => m.Title).Name("Part Number");
+            //Map(m => m.Body__HTML_).Name("Body (HTML)");
+            Map(m => m.SEO_Description).Name("Description");
+            //Map(m => m.Original_Price).Name("Original Price");
+            //Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);
+            //Map(m => m.Vendor).Name("Vendor");
+            //Map(m => m.Type).Name("Type");
+            //Map(m => m.Tags).Name("Tags");
+            //Map(m => m.Variant_SKU).Name("Variant SKU");
+            Map(m => m.Variant_Inventory).Name("Qty Available");
+            //Map(m => m.Variant_Price).Name("Variant Price");
+            //Map(m => m.Variant_Taxable).Name("Variant Taxable");
+            //Map(m => m.VendorShort).Name("VendorShort");
+            //Map(m => m.Lead_Time).Name("Lead Time");
+            //Map(m => m.MOQ).Name("MOQ");
+            Map(m => m.Condition).Name("Condition");
+            //Map(m => m.Collection).Name("Collection");
+            //Map(m => m.Option1_Name).Name("Option1 Name");
+            //Map(m => m.Option1_Value).Name("Option1 Value");
+            //Map(m => m.Option2_Name).Name("Option2 Name");
+            //Map(m => m.Option2_Value).Name("Option2 Value");
+            //Map(m => m.Option3_Name).Name("Option3 Name");
+            //Map(m => m.Option3_Value).Name("Option3 Value");
+            //Map(m => m.Image_Src).Name("Image Src");
+            //Map(m => m.SEO_Title).Name("SEO Title");
+            //Map(m => m.SEO_Description).Name("SEO Description");
+            //Map(m => m.Note).Name("Note");
+            //Map(m => m.).Name("Total Value");
+        }
+    }
+
 
     public class ExcelData
     {
