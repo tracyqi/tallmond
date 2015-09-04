@@ -147,11 +147,11 @@ namespace Inventory
                                     defaultCondition = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCondition : row.ItemArray[index].ToString().Trim();
                                 }
 
-                                string defaultCerts = "FAA 8130 form 3";
+                                string defaultCerts = "";
                                 index = row.Table.Columns.IndexOf("Certificate");
                                 if (index >= 0)
                                 {
-                                    defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? "FAA 8130 form 3" : row.ItemArray[index].ToString().Trim();
+                                    defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCerts : row.ItemArray[index].ToString().Trim();
                                 }
                                 // Special rule, NS means no Cersts
                                 if (defaultCondition == "NS")
@@ -159,7 +159,7 @@ namespace Inventory
                                     defaultCerts = string.Empty;
                                 }
 
-                                string defaultLeadtime = "3-5 ";
+                                string defaultLeadtime = "5-7 ";
                                 index = row.Table.Columns.IndexOf("LeadTime");
                                 if (index >= 0)
                                 {
@@ -327,7 +327,7 @@ namespace Inventory
                 var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
                 foreach (var grp in fileGroups)
                 {
-                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Shopify_" + i++ + ".csv"));
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "General_" + i++ + ".csv"));
 
 
                     #region transform files
