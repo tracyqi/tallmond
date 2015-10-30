@@ -44,5 +44,10 @@ namespace Inventory
         public string Image_Src { get; set; }
         public Nullable<System.DateTime> CreatedDate { get; set; }
         public Nullable<System.DateTime> ModifiedDate { get; set; }
+        public string fob { get; set; }
+        public string Certification { get; set; }
+        public string Dimensions { get; set; }
+        public string Notes { get; set; }
+        public string Technical_Documentation { get; set; }
     }
 }

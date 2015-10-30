@@ -129,3 +129,49 @@ select distinct vendor
 from dbo.inventory
 
 select * from dbo.vendor
+
+update dbo.inventory
+set  [Variant Price] = case when [Original Price]<50 then [Original Price] * 2 
+							when [Original Price] between 50 and 100 then [Original Price] +30
+							when [Original Price] between 100 and 1000 then [Original Price] * 1.25 
+							when [Original Price] between 1000 and 3000 then [Original Price] * 1.2
+							when [Original Price] between 3000 and 10000 then [Original Price] * 1.15
+							when [Original Price] >= 10000 then [Original Price] * 1.11 end
+	from dbo.inventory
+	where vendorshort = 'ab'
+
+                                    --if (originalPrice < 0.01)
+                                    --    finalPrice = 0;
+                                    --else if (originalPrice < 50)
+                                    --    finalPrice = originalPrice * 2;
+                                    --else if (originalPrice < 100)
+                                    --    finalPrice = originalPrice + 30;
+                                    --else if (originalPrice < 1000)
+                                    --    finalPrice = originalPrice * 1.25;
+                                    --else if (originalPrice < 3000)
+                                    --    finalPrice = originalPrice * 1.2;
+                                    --else if (originalPrice < 10000)
+                                    --    finalPrice = originalPrice * 1.15;
+                                    --else
+                                    --    finalPrice = originalPrice * 1.11;
+
+
+Update dbo.inventory
+set vendor ='AirbusSpare'
+where vendor = 'Airbus Spare'
+
+select count(*) 
+from dbo.Inventory
+where vendor='Airbus Spare' and VendorShort = 'ab1'
+
+select * from dbo.inventory
+where title ='D5331030220100'
+
+
+select count(*)
+from dbo.inventory
+where vendor='Zodiac2'
+
+update dbo.inventory
+set vendor ='Zodiac'
+where vendor ='Zodiac2'

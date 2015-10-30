@@ -29,10 +29,13 @@ namespace Inventory
                     GenerateShopify();
                     break;
                 case "OM":
-                    GenerateShopify(180);
+                    GenerateShopify(360);
                     break;
                 case "OMG":
-                    GenerateGeneral(180);
+                    GenerateGeneral(360);
+                    break;
+                case "OMN":
+                    GenerateNew(360);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
@@ -119,19 +122,35 @@ namespace Inventory
                                 {
                                     // =IF(NOT(ISNUMBER(E2)),"",ROUND(IF(E2<0.01,"",IF(E2<100,E2*1.3,IF(E2<1000,E2*1.2,IF(E2<3000,E2*1.15,IF(E2<10000,E2*1.1,IF(E2>=10000,E2*1.06,"")))))),2))
 
+                                    //if (originalPrice < 0.01)
+                                    //    finalPrice = 0;
+                                    //else if (originalPrice < 100)
+                                    //    finalPrice = originalPrice * 1.3;
+                                    //else if (originalPrice < 1000)
+                                    //    finalPrice = originalPrice * 1.2;
+                                    //else if (originalPrice < 3000)
+                                    //    finalPrice = originalPrice * 1.2;
+                                    //else if (originalPrice < 10000)
+                                    //    finalPrice = originalPrice * 1.15;
+                                    //else
+                                    //    finalPrice = originalPrice * 1.11;
+
+
+
                                     if (originalPrice < 0.01)
                                         finalPrice = 0;
+                                    else if (originalPrice < 50)
+                                        finalPrice = originalPrice * 2;
                                     else if (originalPrice < 100)
-                                        finalPrice = originalPrice * 1.3;
+                                        finalPrice = originalPrice + 30;
                                     else if (originalPrice < 1000)
-                                        finalPrice = originalPrice * 1.2;
+                                        finalPrice = originalPrice * 1.25;
                                     else if (originalPrice < 3000)
                                         finalPrice = originalPrice * 1.2;
                                     else if (originalPrice < 10000)
                                         finalPrice = originalPrice * 1.15;
                                     else
                                         finalPrice = originalPrice * 1.11;
-
                                 }
                                 finalPrice = Math.Round(finalPrice, 2);
 
@@ -154,10 +173,10 @@ namespace Inventory
                                     defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCerts : row.ItemArray[index].ToString().Trim();
                                 }
                                 // Special rule, NS means no Cersts
-                                if (defaultCondition == "NS")
-                                {
-                                    defaultCerts = string.Empty;
-                                }
+                                //if (defaultCondition == "NS")
+                                //{
+                                //    defaultCerts = string.Empty;
+                                //}
 
                                 string defaultLeadtime = "5-7 ";
                                 index = row.Table.Columns.IndexOf("LeadTime");
@@ -223,6 +242,8 @@ namespace Inventory
                                 inventory.Collection = collection;
                                 inventory.SEO_Title = string.Join(",", description, "Part Number", pn);
                                 inventory.SEO_Description = inventory.SEO_Title;
+                                inventory.fob = defaultFob;
+                                inventory.Certification = defaultCerts;
                                 //inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
 
 
@@ -306,7 +327,7 @@ namespace Inventory
             #region retrieve records from db
             TallamondEntities entityContext = new TallamondEntities();
 
-            int maxLineCount = 10000;
+            int maxLineCount = Int32.MaxValue;
             string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
 
             string outputfolder = Path.GetDirectoryName(theDirectory);
@@ -337,6 +358,57 @@ namespace Inventory
                         using (var csvwriter = new CsvWriter(writer))
                         {
                             csvwriter.Configuration.RegisterClassMap<OutputGeneral>();
+
+
+                            csvwriter.WriteHeader<Inventory>();
+
+                            foreach (var record in grp)
+                            {
+                                csvwriter.WriteRecord<Inventory>(record);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+            }
+        }
+
+        private static void GenerateNew(int days = 0)
+        {
+            #region retrieve records from db
+            TallamondEntities entityContext = new TallamondEntities();
+
+            int maxLineCount = Int32.MaxValue;
+            string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
+
+            string outputfolder = Path.GetDirectoryName(theDirectory);
+
+            DateTime modDate = DateTime.Now.AddDays(days * -1);
+
+            var vendors = entityContext.Vendors;
+
+
+
+            #endregion
+
+            int i = 0;
+            foreach (var ven in vendors)
+            {
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true && o.ModifiedDate >= modDate);
+
+                var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
+                foreach (var grp in fileGroups)
+                {
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Tallamond_" + i++ + ".csv"));
+
+
+                    #region transform files
+                    //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
+                    using (TextWriter writer = File.CreateText(outfile))
+                    {
+                        using (var csvwriter = new CsvWriter(writer))
+                        {
+                            csvwriter.Configuration.RegisterClassMap<OutputNew>();
 
 
                             csvwriter.WriteHeader<Inventory>();
@@ -410,6 +482,49 @@ namespace Inventory
             //Map(m => m.Lead_Time).Name("Lead Time");
             //Map(m => m.MOQ).Name("MOQ");
             Map(m => m.Condition).Name("Condition");
+            //Map(m => m.Collection).Name("Collection");
+            //Map(m => m.Option1_Name).Name("Option1 Name");
+            //Map(m => m.Option1_Value).Name("Option1 Value");
+            //Map(m => m.Option2_Name).Name("Option2 Name");
+            //Map(m => m.Option2_Value).Name("Option2 Value");
+            //Map(m => m.Option3_Name).Name("Option3 Name");
+            //Map(m => m.Option3_Value).Name("Option3 Value");
+            //Map(m => m.Image_Src).Name("Image Src");
+            //Map(m => m.SEO_Title).Name("SEO Title");
+            //Map(m => m.SEO_Description).Name("SEO Description");
+            //Map(m => m.Note).Name("Note");
+            //Map(m => m.).Name("Total Value");
+        }
+    }
+
+    public sealed class OutputNew : CsvClassMap<Inventory>
+    {
+        public OutputNew()
+        {
+            Map(m => m.Title).Name("PartNumber");
+            Map(m => m.SEO_Description).Name("Description");
+            Map(m => m.Condition).Name("Condition");
+            Map(m => m.fob).Name("FOB");
+            Map(m => m.Certification ).Name("Certification");
+            Map(m => m.Lead_Time).Name("LeadTime");
+            Map(m => m.Variant_Inventory).Name("Inventory Qty");
+            Map(m => m.Variant_Price).Name("Price");
+            Map(m => m.Dimensions).Name("Dimensions");
+            Map(m => m.Notes).Name("Notes");
+            Map(m => m.Technical_Documentation).Name("Technical Documentation");
+
+            //Map(m => m.Original_Price).Name("Original Price");
+            //Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);
+            //Map(m => m.Vendor).Name("Vendor");
+            //Map(m => m.Type).Name("Type");
+            //Map(m => m.Tags).Name("Tags");
+            //Map(m => m.Variant_SKU).Name("Variant SKU");
+            //Map(m => m.Variant_Inventory).Name("Qty Available");
+            //Map(m => m.Variant_Price).Name("Variant Price");
+            //Map(m => m.Variant_Taxable).Name("Variant Taxable");
+            //Map(m => m.VendorShort).Name("VendorShort");
+            //Map(m => m.Lead_Time).Name("Lead Time");
+            //Map(m => m.MOQ).Name("MOQ");
             //Map(m => m.Collection).Name("Collection");
             //Map(m => m.Option1_Name).Name("Option1 Name");
             //Map(m => m.Option1_Value).Name("Option1 Value");
