@@ -386,6 +386,7 @@ namespace Inventory
         {
             #region retrieve records from db
             TallamondEntities entityContext = new TallamondEntities();
+            
 
             int maxLineCount = Int32.MaxValue;
             string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
@@ -403,7 +404,7 @@ namespace Inventory
             int i = 0;
             foreach (var ven in vendors)
             {
-                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true && o.ModifiedDate >= modDate);
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true); //&& o.ModifiedDate >= modDate);
 
                 var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
                 foreach (var grp in fileGroups)
