@@ -510,7 +510,7 @@ namespace Inventory
     {
         public OutputNew()
         {
-            Map(m => m.Title).Name("category");
+            Map(m => m.category).Name("category");
             Map(m => m.Title).Name("name");
             Map(m => m.Variant_SKU).Name("description");
             Map(m => m.SEO_Description).Name("short_description");

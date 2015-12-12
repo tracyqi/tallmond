@@ -49,14 +49,16 @@ namespace Inventory
         public string Dimensions { get; set; }
         public string Notes { get; set; }
         public string Technical_Documentation { get; set; }
-        public string tax_class_id { get; set; }
-        public string is_in_stock { get; set; }
-        public string weight { get; set; }
+        public string tax_class_id { get { return "None"; } }
+        public string is_in_stock { get { return "In Stock"; } }
+        public string weight { get { return "0.0000"; } }
         public string combine { get
             {
                 return this.Condition + "::" + this.fob + "::" + this.Certification + "::" + this.Lead_Time;
                     }
 
         }
+
+        public string category {  get { return "Aircraft Parts"; } }
     }
 }
