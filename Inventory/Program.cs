@@ -145,8 +145,8 @@ namespace Inventory
                                         finalPrice = originalPrice + 30;
                                     else if (originalPrice < 1000)
                                         finalPrice = originalPrice * 1.25;
-                                    else if (originalPrice < 3000)
-                                        finalPrice = originalPrice * 1.2;
+                                    //else if (originalPrice < 3000)
+                                    //    finalPrice = originalPrice * 1.2;
                                     else if (originalPrice < 10000)
                                         finalPrice = originalPrice * 1.15;
                                     else
@@ -200,6 +200,13 @@ namespace Inventory
                                     defaultMOQ = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultMOQ : row.ItemArray[index].ToString().Trim();
                                 }
 
+                                string notes = "";
+                                index = row.Table.Columns.IndexOf("Notes");
+                                if (index >= 0)
+                                {
+                                    notes = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? notes : row.ItemArray[index].ToString().Trim();
+                                }
+
 
                                 StringBuilder sb = new StringBuilder();
                                 string note = "<li><b>Condition:</b> " + defaultCondition + "</li> " +
@@ -207,8 +214,9 @@ namespace Inventory
                                                     "<li>All parts are subject to prior sale </li> " +
                                                     //((finalPrice >= 200) ? string.Empty : "<li>Minimum Order Amount:" + defaultMOQ + "</li>") +
                                                     "<li>Sale price is effective for available inventory only </li> " +
-                                                    (string.IsNullOrEmpty(defaultFob) ? "" : ("<li><b> " + defaultFob + " </b></li> ")) +
-                                                    "<li>Lead time is " + defaultLeadtime + " days based on available inventory </li> "
+                                                    (string.IsNullOrEmpty(defaultFob) ? "" : ("<li><b> FOB " + defaultFob + " </b></li> ")) +
+                                                    "<li>Lead time is " + defaultLeadtime + " based on available inventory </li> "
+                                                    //+ notes
                                                     ;
 
                                 sb.AppendFormat("{0}{1}{2}", "<b>Description: </b>", description, "<br>");
@@ -244,6 +252,7 @@ namespace Inventory
                                 inventory.SEO_Description = inventory.SEO_Title;
                                 inventory.fob = defaultFob;
                                 inventory.Certification = defaultCerts;
+                                inventory.Notes = notes;
                                 //inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
 
 
@@ -501,17 +510,31 @@ namespace Inventory
     {
         public OutputNew()
         {
-            Map(m => m.Title).Name("PartNumber");
-            Map(m => m.SEO_Description).Name("Description");
-            Map(m => m.Condition).Name("Condition");
-            Map(m => m.fob).Name("FOB");
-            Map(m => m.Certification ).Name("Certification");
-            Map(m => m.Lead_Time).Name("LeadTime");
-            Map(m => m.Variant_Inventory).Name("Inventory Qty");
+            Map(m => m.Title).Name("category");
+            Map(m => m.Title).Name("name");
+            Map(m => m.Variant_SKU).Name("description");
+            Map(m => m.SEO_Description).Name("short_description");
+            Map(m => m.Handle).Name("sku");
             Map(m => m.Variant_Price).Name("Price");
-            Map(m => m.Dimensions).Name("Dimensions");
-            Map(m => m.Notes).Name("Notes");
-            Map(m => m.Technical_Documentation).Name("Technical Documentation");
+            Map(m => m.tax_class_id).Name("tax_class_id");
+            Map(m => m.is_in_stock).Name("is_in_stock");
+            Map(m => m.Variant_Inventory ).Name("stock");
+            Map(m => m.weight).Name("weight");
+            Map(m => m.Image_Src).Name("image");
+            Map(m => m.combine).Name("Condition,FOB,Certification,lead_time");
+
+            //Map(m => m.Title).Name("PartNumber");
+            //Map(m => m.Condition).Name("Condition");
+            //Map(m => m.fob).Name("FOB");
+            //Map(m => m.Certification ).Name("Certification");
+            //Map(m => m.Lead_Time).Name("LeadTime");
+            //Map(m => m.Variant_Inventory).Name("Inventory Qty");
+            //Map(m => m.Dimensions).Name("Dimensions");
+            //Map(m => m.Notes).Name("Notes");
+            //Map(m => m.Technical_Documentation).Name("Technical Documentation");
+
+
+            //category name    description short_description   sku Price   tax_class_id is_in_stock stock weight  image Condition, FOB, Certification, lead_time
 
             //Map(m => m.Original_Price).Name("Original Price");
             //Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);

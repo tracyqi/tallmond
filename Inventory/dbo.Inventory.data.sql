@@ -175,3 +175,17 @@ where vendor='Zodiac2'
 update dbo.inventory
 set vendor ='Zodiac'
 where vendor ='Zodiac2'
+
+
+select count(*)
+from dbo.inventory
+where vendorshort='zg' and title ='115760-11'--'117601-113'
+
+update dbo.Inventory
+set [Body (HTML)] = REPLACE([Body (HTML)], 'weeks based on available', 'week(s) based on available')
+
+--delete from dbo.Inventory
+where vendorshort='zg' 
+
+
+<b>Description: </b>FILTER<br><b>Part Number: </b>117601-113<br><b> Note:</b><br><li><b>Condition:</b> FN</li> <li>Comes with EASA Form1 </li> <li>All parts are subject to prior sale </li> <li>Sale price is effective for available inventory only </li> <li><b> FOB Europe </b></li> <li>Lead time is 1 weeks based on available inventory </li> 

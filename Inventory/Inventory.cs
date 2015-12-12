@@ -49,5 +49,14 @@ namespace Inventory
         public string Dimensions { get; set; }
         public string Notes { get; set; }
         public string Technical_Documentation { get; set; }
+        public string tax_class_id { get; set; }
+        public string is_in_stock { get; set; }
+        public string weight { get; set; }
+        public string combine { get
+            {
+                return this.Condition + "::" + this.fob + "::" + this.Certification + "::" + this.Lead_Time;
+                    }
+
+        }
     }
 }
