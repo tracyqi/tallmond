@@ -189,3 +189,6 @@ where vendorshort='zg'
 
 
 <b>Description: </b>FILTER<br><b>Part Number: </b>117601-113<br><b> Note:</b><br><li><b>Condition:</b> FN</li> <li>Comes with EASA Form1 </li> <li>All parts are subject to prior sale </li> <li>Sale price is effective for available inventory only </li> <li><b> FOB Europe </b></li> <li>Lead time is 1 weeks based on available inventory </li> 
+
+
+select top 10 * from dbo.inventory

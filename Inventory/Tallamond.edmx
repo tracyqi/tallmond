@@ -44,6 +44,7 @@
           <Property Name="Dimensions" Type="varchar" MaxLength="50" />
           <Property Name="Notes" Type="varchar" MaxLength="5000" />
           <Property Name="Technical Documentation" Type="varchar" MaxLength="5000" />
+          <Property Name="Category" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="Vendor">
           <Key>
@@ -104,6 +105,7 @@
           <Property Name="Dimensions" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Notes" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
           <Property Name="Technical_Documentation" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="Category" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Vendor">
           <Key>
@@ -122,6 +124,7 @@
           <EntitySetMapping Name="Inventories">
             <EntityTypeMapping TypeName="TallamondModel.Inventory">
               <MappingFragment StoreEntitySet="Inventory">
+                <ScalarProperty Name="Category" ColumnName="Category" />
                 <ScalarProperty Name="Technical_Documentation" ColumnName="Technical Documentation" />
                 <ScalarProperty Name="Notes" ColumnName="Notes" />
                 <ScalarProperty Name="Dimensions" ColumnName="Dimensions" />

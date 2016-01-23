@@ -14,6 +14,16 @@ using System.Text.RegularExpressions;
 
 namespace Inventory
 {
+    public static class MyExtensions
+    {
+        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> items,
+                                                           int maxItems)
+        {
+            return items.Select((item, inx) => new { item, inx })
+                        .GroupBy(x => x.inx / maxItems)
+                        .Select(g => g.Select(x => x.item));
+        }
+    }
     class Program
     {
         private static int batchamount = 5000;
@@ -36,6 +46,9 @@ namespace Inventory
                     break;
                 case "OMN":
                     GenerateNew(360);
+                    break;
+                case "OMN2":
+                    GenerateNewV2(args[1],360);
                     break;
                 default:
                     throw new Exception("Wrong parameter");
@@ -172,6 +185,14 @@ namespace Inventory
                                 {
                                     defaultCerts = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCerts : row.ItemArray[index].ToString().Trim();
                                 }
+
+                                string defaultCat = "Aviation Parts";
+                                index = row.Table.Columns.IndexOf("Category");
+                                if (index >= 0)
+                                {
+                                    defaultCat = string.IsNullOrEmpty(row.ItemArray[index].ToString().Trim()) ? defaultCerts : row.ItemArray[index].ToString().Trim();
+                                }
+
                                 // Special rule, NS means no Cersts
                                 //if (defaultCondition == "NS")
                                 //{
@@ -253,6 +274,7 @@ namespace Inventory
                                 inventory.fob = defaultFob;
                                 inventory.Certification = defaultCerts;
                                 inventory.Notes = notes;
+                                inventory.Category = defaultCat;
                                 //inventory.Image_Src = "https://cdn.shopify.com/s/files/1/0416/3905/files/comingsoon_small_bw.gif";
 
 
@@ -352,12 +374,12 @@ namespace Inventory
             int i = 0;
             foreach (var ven in vendors)
             {
-                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true && o.ModifiedDate >= modDate);
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.VendorShort, ven.VendorShort, true) == 0 && o.Published == true); //&& o.ModifiedDate >= modDate);
 
                 var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
                 foreach (var grp in fileGroups)
                 {
-                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "General_" + i++ + ".csv"));
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().VendorShort + "_" + "General_" + i++ + ".csv"));
 
 
                     #region transform files
@@ -388,7 +410,7 @@ namespace Inventory
             TallamondEntities entityContext = new TallamondEntities();
             
 
-            int maxLineCount = Int32.MaxValue;
+            int maxLineCount = 5000;
             string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
 
             string outputfolder = Path.GetDirectoryName(theDirectory);
@@ -404,12 +426,12 @@ namespace Inventory
             int i = 0;
             foreach (var ven in vendors)
             {
-                var inventories = entityContext.Inventories.Where(o => string.Compare(o.Vendor, ven.VendorName, true) == 0 && o.Published == true); //&& o.ModifiedDate >= modDate);
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.VendorShort, ven.VendorShort, true) == 0 && o.Published == true); //&& o.ModifiedDate >= modDate);
 
                 var fileGroups = inventories.GroupBy(x => x.Id / maxLineCount);
                 foreach (var grp in fileGroups)
                 {
-                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().Vendor + "_" + "Tallamond_" + i++ + ".csv"));
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().VendorShort+ "_" + "Tallamond_" + i++ + ".csv"));
 
 
                     #region transform files
@@ -420,6 +442,59 @@ namespace Inventory
                         {
                             csvwriter.Configuration.RegisterClassMap<OutputNew>();
 
+
+                            csvwriter.WriteHeader<Inventory>();
+
+                            foreach (var record in grp)
+                            {
+                                csvwriter.WriteRecord<Inventory>(record);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+            }
+        }
+
+        private static void GenerateNewV2(string vendor, int days = 0)
+        {
+            #region retrieve records from db
+            TallamondEntities entityContext = new TallamondEntities();
+
+            int maxLineCount = Int32.MaxValue;
+        
+            string theDirectory = System.Reflection.Assembly.GetAssembly(typeof(Inventory)).Location; ;
+
+            string outputfolder = Path.GetDirectoryName(theDirectory);
+
+            DateTime modDate = DateTime.Now.AddDays(days * -1);
+
+            var vendors = entityContext.Vendors;
+
+
+
+            #endregion
+
+            int i = 0;
+            foreach (var ven in vendors)
+            {
+                var inventories = entityContext.Inventories.Where(o => string.Compare(o.VendorShort, ven.VendorShort, true) == 0 && o.Published == true && o.VendorShort ==vendor); //&& o.ModifiedDate >= modDate);
+
+                var fileGroups = inventories.Batch(maxLineCount);//.GroupBy(x => x.Id / maxLineCount);
+                foreach (var grp in fileGroups)
+                {
+                    string outfile = Path.Combine(Path.Combine(outputfolder, grp.First().VendorShort + "_" + "Tallamond_" + i++ + ".csv"));
+
+
+                    #region transform files
+                    //string outfile_error = Path.Combine(Path.Combine(outputfolder, "Shopify_error_" + fn));
+                    using (TextWriter writer = File.CreateText(outfile))
+                    {
+                        using (var csvwriter = new CsvWriter(writer))
+                        {
+                            csvwriter.Configuration.RegisterClassMap<OutputNewV2>();
+                            csvwriter.Configuration.QuoteAllFields = true;
+                            //csvwriter.Configuration.
 
                             csvwriter.WriteHeader<Inventory>();
 
@@ -467,6 +542,7 @@ namespace Inventory
             Map(m => m.Image_Src).Name("Image Src");
             Map(m => m.SEO_Title).Name("SEO Title");
             Map(m => m.SEO_Description).Name("SEO Description");
+            Map(m => m.Notes).Name("Notes");
             //Map(m => m.Note).Name("Note");
             //Map(m => m.).Name("Total Value");
         }
@@ -511,24 +587,88 @@ namespace Inventory
     {
         public OutputNew()
         {
-            Map(m => m.category).Name("category");
+            Map(m => m.Category).Name("category");
             Map(m => m.Title).Name("name");
             Map(m => m.Variant_SKU).Name("description");
             Map(m => m.SEO_Description).Name("short_description");
             Map(m => m.Handle).Name("sku");
             Map(m => m.Variant_Price).Name("Price");
-            Map(m => m.tax_class_id).Name("tax_class_id");
-            Map(m => m.is_in_stock).Name("is_in_stock");
-            Map(m => m.Variant_Inventory ).Name("stock");
-            Map(m => m.weight).Name("weight");
-            Map(m => m.Image_Src).Name("image");
-            Map(m => m.combine).Name("Condition,FOB,Certification,lead_time");
+            //Map(m => m.tx).Name("tax_class_id");
+            //Map(m => m.is_in_stock).Name("is_in_stock");
+            //Map(m => m.Variant_Inventory ).Name("stock");
+            //Map(m => m.weight).Name("weight");
+            //Map(m => m.Image_Src).Name("image");
+            //Map(m => m.combine).Name("Condition,FOB,Certification,lead_time");
 
             //Map(m => m.Title).Name("PartNumber");
             //Map(m => m.Condition).Name("Condition");
             //Map(m => m.fob).Name("FOB");
             //Map(m => m.Certification ).Name("Certification");
             //Map(m => m.Lead_Time).Name("LeadTime");
+            //Map(m => m.Variant_Inventory).Name("Inventory Qty");
+            //Map(m => m.Dimensions).Name("Dimensions");
+            //Map(m => m.Notes).Name("Notes");
+            //Map(m => m.Technical_Documentation).Name("Technical Documentation");
+
+
+            //category name    description short_description   sku Price   tax_class_id is_in_stock stock weight  image Condition, FOB, Certification, lead_time
+
+            //Map(m => m.Original_Price).Name("Original Price");
+            //Map(m => m.Original_Price).TypeConverterOption(NumberStyles.Currency);
+            //Map(m => m.Vendor).Name("Vendor");
+            //Map(m => m.Type).Name("Type");
+            //Map(m => m.Tags).Name("Tags");
+            //Map(m => m.Variant_SKU).Name("Variant SKU");
+            //Map(m => m.Variant_Inventory).Name("Qty Available");
+            //Map(m => m.Variant_Price).Name("Variant Price");
+            //Map(m => m.Variant_Taxable).Name("Variant Taxable");
+            //Map(m => m.VendorShort).Name("VendorShort");
+            //Map(m => m.Lead_Time).Name("Lead Time");
+            //Map(m => m.MOQ).Name("MOQ");
+            //Map(m => m.Collection).Name("Collection");
+            //Map(m => m.Option1_Name).Name("Option1 Name");
+            //Map(m => m.Option1_Value).Name("Option1 Value");
+            //Map(m => m.Option2_Name).Name("Option2 Name");
+            //Map(m => m.Option2_Value).Name("Option2 Value");
+            //Map(m => m.Option3_Name).Name("Option3 Name");
+            //Map(m => m.Option3_Value).Name("Option3 Value");
+            //Map(m => m.Image_Src).Name("Image Src");
+            //Map(m => m.SEO_Title).Name("SEO Title");
+            //Map(m => m.SEO_Description).Name("SEO Description");
+            //Map(m => m.Note).Name("Note");
+            //Map(m => m.).Name("Total Value");
+        }
+    }
+
+    public sealed class OutputNewV2 : CsvClassMap<Inventory>
+    {
+        public OutputNewV2()
+        {
+            //Map(m => m.category).Name("category");
+            //Map(m => m.Handle).Name("sku");
+            Map(m => m.Title).Name("Name");
+            Map(m => m.Title).Name("PartNumber");
+            Map(m => m.Variant_Price).Name("Price");
+            Map(m => m.SEO_Description).Name("Description");
+            Map(m => m.Variant_Inventory).Name("Quantity");
+            Map(m => m.Category).Name("categories");
+
+            //Map(m => m.SEO_Description).Name("short_description");
+            //Map(m => m.tax_class_id).Name("tax_class_id");
+            //Map(m => m.is_in_stock).Default("Out of Stock");
+            //Map(m => m.weight).Name("stock").Default(0);
+            //Map(m => m.weight).Name("weight");
+            //Map(m => m.Image_Src).Name("images");
+            //Map(m => m.combine).Name("Condition,FOB,Certification,lead_time");
+
+            Map(m => m.Condition).Name("Condition");
+            Map(m => m.fob).Name("FOB");
+            Map(m => m.Certification ).Name("Certification");
+            Map(m => m.Lead_Time).Name("LeadTime");
+            Map(m => m.MOQ).Name("min_qty");
+            Map(m => m.Notes).Name("Notes");
+
+
             //Map(m => m.Variant_Inventory).Name("Inventory Qty");
             //Map(m => m.Dimensions).Name("Dimensions");
             //Map(m => m.Notes).Name("Notes");
